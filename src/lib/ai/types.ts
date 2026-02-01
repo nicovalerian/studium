@@ -17,7 +17,7 @@ export interface ChatSuccess {
 export interface ChatRateLimited {
   rateLimited: true;
   retryAfter: number;
-  provider: 'groq' | 'gemini' | 'both';
+  provider: 'azure';
 }
 
 export type ChatResponse = ChatSuccess | ChatRateLimited;
