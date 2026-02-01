@@ -23,7 +23,7 @@ export function UserNav({ user }: UserNavProps) {
 
   const handleSignOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
 
       if (error) {
         console.error('Sign out error:', error);
@@ -40,8 +40,14 @@ export function UserNav({ user }: UserNavProps) {
         description: 'You have been signed out successfully.',
       });
 
-      // Hard redirect to login page
-      window.location.href = '/login';
+      const redirectBase = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+      try {
+        localStorage.removeItem('supabase.auth.token');
+        sessionStorage.removeItem('supabase.auth.token');
+      } catch {
+        // ignore storage cleanup errors
+      }
+      window.location.href = `${redirectBase}/login`;
     } catch (error) {
       console.error('Unexpected error during sign out:', error);
       toast({

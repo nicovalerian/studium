@@ -181,6 +181,7 @@ Click **Edit** next to Environment Variables and add ALL of these:
 
 | Variable                        | Value                                               |
 | ------------------------------- | --------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`          | Your app URL (e.g. http://localhost:3000)           |
 | `NEXT_PUBLIC_SUPABASE_URL`      | Your Supabase project URL                           |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon key                              |
 | `SUPABASE_SERVICE_ROLE_KEY`     | Your Supabase service role key                      |

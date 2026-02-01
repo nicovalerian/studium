@@ -64,7 +64,15 @@ export function FileUpload({ classId, onUploadComplete }: FileUploadProps) {
 
         setProgress(100);
 
-        if (data.was_truncated) {
+        if (data.embedding_status === 'failed') {
+          toast({
+            title: 'Upload complete, processing failed',
+            description:
+              data.error_message ||
+              'Document processing failed. You can retry from the documents list.',
+            variant: 'destructive',
+          });
+        } else if (data.was_truncated) {
           toast({
             title: 'Document uploaded',
             description: 'Document was truncated to ~22,500 words due to size limits.',
@@ -106,7 +114,9 @@ export function FileUpload({ classId, onUploadComplete }: FileUploadProps) {
       <div
         {...getRootProps()}
         className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
-          isDragActive ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-primary/50'
+          isDragActive
+            ? 'border-primary bg-primary/5'
+            : 'border-muted-foreground/25 hover:border-primary/50'
         } ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
       >
         <input {...getInputProps()} />

@@ -33,10 +33,7 @@ export async function POST(request: Request) {
   }
 
   if (file.size > MAX_FILE_SIZE) {
-    return NextResponse.json(
-      { error: 'File too large. Maximum size is 10MB.' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'File too large. Maximum size is 10MB.' }, { status: 400 });
   }
 
   const fileType = getFileType(file.type);
@@ -53,18 +50,20 @@ export async function POST(request: Request) {
     extractedText = result.text;
     wasTruncated = result.wasTruncated;
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Could not read this file. It may be corrupted or password-protected.';
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Could not read this file. It may be corrupted or password-protected.';
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
   const documentId = crypto.randomUUID();
   const filePath = `${user.id}/${documentId}/${file.name}`;
 
-  const { error: storageError } = await supabase.storage
-    .from('documents')
-    .upload(filePath, file);
+  const { error: storageError } = await supabase.storage.from('documents').upload(filePath, file);
 
   if (storageError) {
+    console.error('Storage upload error:', storageError);
     return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
   }
 
@@ -80,16 +79,21 @@ export async function POST(request: Request) {
   });
 
   if (insertError) {
+    console.error('Document insert error:', insertError);
     await supabase.storage.from('documents').remove([filePath]);
     return NextResponse.json({ error: 'Failed to save document' }, { status: 500 });
   }
+  try {
+    const embeddingResult = await generateDocumentEmbeddings(supabase, documentId, extractedText);
 
-  const embeddingResult = await generateDocumentEmbeddings(supabase, documentId, extractedText);
-
-  return NextResponse.json({
-    document_id: documentId,
-    embedding_status: embeddingResult.embedding_status,
-    error_message: embeddingResult.error_message,
-    was_truncated: wasTruncated,
-  });
+    return NextResponse.json({
+      document_id: documentId,
+      embedding_status: embeddingResult.embedding_status,
+      error_message: embeddingResult.error_message,
+      was_truncated: wasTruncated,
+    });
+  } catch (error) {
+    console.error('Embedding generation error:', error);
+    return NextResponse.json({ error: 'Failed to process document embeddings' }, { status: 500 });
+  }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { FileUpload } from '@/components/documents/file-upload';
 import { DocumentList } from '@/components/documents/document-list';
@@ -40,8 +40,28 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
 
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
+  const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [isLoading, setIsLoading] = useState(false);
   const [rateLimit, setRateLimit] = useState<RateLimitState | null>(null);
+
+  useEffect(() => {
+    setDocuments(initialDocuments);
+  }, [initialDocuments]);
+
+  const refreshDocuments = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('documents')
+      .select('id, filename, display_name, embedding_status, created_at')
+      .eq('class_id', classId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching documents:', error);
+      return;
+    }
+
+    setDocuments(data || []);
+  }, [classId, supabase]);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -88,8 +108,23 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
   }, [classId, supabase]);
 
   const handleUploadComplete = () => {
+    refreshDocuments();
     router.refresh();
   };
+
+  useEffect(() => {
+    const hasPending = documents.some(
+      (doc) => doc.embedding_status === 'pending' || doc.embedding_status === 'processing'
+    );
+
+    if (!hasPending) return;
+
+    const intervalId = setInterval(() => {
+      refreshDocuments();
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [documents, refreshDocuments]);
 
   const handleSendMessage = async (content: string) => {
     const userMessage: MessageProps = { role: 'user', content };
@@ -116,6 +151,13 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
             description: `Please wait ${data.retry_after} seconds before sending another message.`,
             variant: 'destructive',
           });
+        } else if (response.status === 401) {
+          toast({
+            title: 'Session expired',
+            description: 'Please sign in again to continue chatting.',
+            variant: 'destructive',
+          });
+          router.push('/login');
         } else {
           throw new Error(data.error || 'Failed to send message');
         }
@@ -126,9 +168,10 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
+      const message = error instanceof Error ? error.message : 'Failed to send message.';
       toast({
         title: 'Error',
-        description: 'Failed to send message. Please try again.',
+        description: message,
         variant: 'destructive',
       });
     } finally {
@@ -161,7 +204,7 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
               <CardTitle>Documents</CardTitle>
             </CardHeader>
             <CardContent>
-              <DocumentList documents={initialDocuments} />
+              <DocumentList documents={documents} />
             </CardContent>
           </Card>
           <div className="h-[500px]">
@@ -195,7 +238,7 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
                     onSend={handleSendMessage}
                     isLoading={isLoading}
                     placeholder={
-                      initialDocuments.length === 0
+                      documents.length === 0
                         ? 'Upload documents to start chatting...'
                         : 'Ask a question about your documents...'
                     }
