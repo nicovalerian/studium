@@ -177,76 +177,66 @@ create policy "Users can CRUD their own messages"
 
 ---
 
-## Step 2: Azure OpenAI Setup (GitHub Student Pack)
+## Step 2: Azure AI Foundry Setup (GitHub Student Pack)
 
 ### 2.1 Claim Azure Credits
 
 1. Go to [GitHub Student Developer Pack](https://education.github.com/pack)
 2. Find **Microsoft Azure** and click to claim
-3. You'll get $100 in Azure credits
+3. You'll get $100-$200 in Azure credits
 
-### 2.2 Create Azure OpenAI Resource
+### 2.2 Create Azure AI Foundry Resource
 
 1. Go to [Azure Portal](https://portal.azure.com)
-2. Search for **Azure OpenAI** and click **Create**
+2. Search for **Azure AI services** or **Microsoft Foundry** and click **Create**
 3. Fill in:
    - Subscription: Your student subscription
    - Resource group: Create new → `studium-rg`
-   - Region: `East US` (has best model availability)
-   - Name: `studium-openai`
+   - Region: `Southeast Asia` (or closest to your users)
+   - Name: `studium-ai`
    - Pricing tier: `Standard S0`
 4. Click **Review + create** → **Create**
 5. Wait for deployment (~2 minutes)
 
-### 2.3 Deploy Embedding Model
+### 2.3 Deploy Models
 
-1. Go to your Azure OpenAI resource
-2. Click **Go to Azure OpenAI Studio**
-3. Click **Deployments** → **Create new deployment**
-4. Select:
-   - Model: `text-embedding-3-small`
-   - Deployment name: `text-embedding-3-small`
-   - Deployment type: Standard
-5. Click **Create**
+1. Go to [Azure AI Foundry Portal](https://ai.azure.com)
+2. Select your resource
+3. Go to **Model Deployments** → **Deploy model**
+
+**Deploy Chat Model:**
+
+- Model: `gpt-5-nano`
+- Deployment name: `gpt-5-nano` (use this exact name)
+- Click **Deploy**
+
+**Deploy Embedding Model:**
+
+- Model: `text-embedding-3-small`
+- Deployment name: `text-embedding-3-small`
+- Click **Deploy**
 
 ### 2.4 Get API Keys
 
-1. In Azure Portal, go to your OpenAI resource
+1. In Azure Portal, go to your AI Foundry resource
 2. Click **Keys and Endpoint**
 3. Copy:
    - `KEY 1` → This is your `AZURE_OPENAI_API_KEY`
    - `Endpoint` → This is your `AZURE_OPENAI_ENDPOINT`
-4. Your `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` is `text-embedding-3-small`
+4. Your deployment names are:
+   - `AZURE_OPENAI_CHAT_DEPLOYMENT` = `gpt-5-nano`
+   - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` = `text-embedding-3-small`
 
 ---
 
-## Step 3: Groq API Setup (Free)
+## Step 3: Deploy to DigitalOcean App Platform
 
-1. Go to [console.groq.com](https://console.groq.com)
-2. Sign up / Sign in
-3. Go to **API Keys** → **Create API Key**
-4. Name it `studium`
-5. Copy the key → This is your `GROQ_API_KEY`
-
----
-
-## Step 4: Google Gemini API Setup (Free)
-
-1. Go to [aistudio.google.com](https://aistudio.google.com)
-2. Click **Get API key** → **Create API key**
-3. Select a project or create new
-4. Copy the key → This is your `GOOGLE_GENERATIVE_AI_API_KEY`
-
----
-
-## Step 5: Deploy to DigitalOcean App Platform
-
-### 5.1 Claim DigitalOcean Credits
+### 3.1 Claim DigitalOcean Credits
 
 1. Go to [GitHub Student Developer Pack](https://education.github.com/pack)
 2. Find **DigitalOcean** and claim $200 credits
 
-### 5.2 Push Code to GitHub
+### 3.2 Push Code to GitHub
 
 ```bash
 cd C:\Users\nico\Documents\Studium
@@ -263,7 +253,7 @@ git branch -M main
 git push -u origin main
 ```
 
-### 5.3 Create DigitalOcean App
+### 3.3 Create DigitalOcean App
 
 1. Go to [cloud.digitalocean.com/apps](https://cloud.digitalocean.com/apps)
 2. Click **Create App**
@@ -272,7 +262,7 @@ git push -u origin main
 5. Branch: `main`
 6. Click **Next**
 
-### 5.4 Configure Build Settings
+### 3.4 Configure Build Settings
 
 1. Resource Type: **Web Service**
 2. Build Command: `npm run build`
@@ -280,23 +270,23 @@ git push -u origin main
 4. HTTP Port: `3000`
 5. Instance Size: **Basic** ($5/month, covered by credits)
 
-### 5.5 Add Environment Variables
+### 3.5 Add Environment Variables
 
 Click **Edit** next to Environment Variables and add ALL of these:
 
-| Variable                            | Value                      |
-| ----------------------------------- | -------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`          | Your Supabase project URL  |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY`     | Your Supabase anon key     |
-| `AZURE_OPENAI_API_KEY`              | Your Azure OpenAI key      |
-| `AZURE_OPENAI_ENDPOINT`             | Your Azure OpenAI endpoint |
-| `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` | `text-embedding-3-small`   |
-| `GROQ_API_KEY`                      | Your Groq API key          |
-| `GOOGLE_GENERATIVE_AI_API_KEY`      | Your Gemini API key        |
+| Variable                            | Value                          |
+| ----------------------------------- | ------------------------------ |
+| `NEXT_PUBLIC_SUPABASE_URL`          | Your Supabase project URL      |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`     | Your Supabase anon key         |
+| `SUPABASE_SERVICE_ROLE_KEY`         | Your Supabase service role     |
+| `AZURE_OPENAI_API_KEY`              | Your Azure AI Foundry key      |
+| `AZURE_OPENAI_ENDPOINT`             | Your Azure AI Foundry endpoint |
+| `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` | `text-embedding-3-small`       |
+| `AZURE_OPENAI_CHAT_DEPLOYMENT`      | `gpt-5-nano`                   |
 
 Mark sensitive keys as **Encrypted**.
 
-### 5.6 Deploy
+### 3.6 Deploy
 
 1. Click **Next** through remaining steps
 2. Review and click **Create Resources**
@@ -305,16 +295,16 @@ Mark sensitive keys as **Encrypted**.
 
 ---
 
-## Step 6: Update OAuth Redirect URLs
+## Step 4: Update OAuth Redirect URLs
 
-### 6.1 Update Supabase
+### 4.1 Update Supabase
 
 1. Go to Supabase → **Authentication** → **URL Configuration**
 2. Update **Site URL** to your DigitalOcean URL
 3. Add to **Redirect URLs**:
    - `https://studium-xxxxx.ondigitalocean.app/auth/callback`
 
-### 6.2 Update Google OAuth
+### 4.2 Update Google OAuth
 
 1. Go to Google Cloud Console → **Credentials**
 2. Edit your OAuth client
@@ -325,15 +315,15 @@ Mark sensitive keys as **Encrypted**.
 
 ---
 
-## Step 7: Custom Domain (Optional)
+## Step 5: Custom Domain (Optional)
 
-### 7.1 Claim .TECH Domain
+### 5.1 Claim .TECH Domain
 
 1. Go to [GitHub Student Developer Pack](https://education.github.com/pack)
 2. Find **.TECH Domains** and claim a free domain
 3. Register `studium.tech` (or similar)
 
-### 7.2 Configure DNS
+### 5.2 Configure DNS
 
 1. In your .TECH domain dashboard, add DNS records:
    - Type: `CNAME`
@@ -345,7 +335,7 @@ Mark sensitive keys as **Encrypted**.
    - Add your custom domain
    - DigitalOcean will auto-provision SSL
 
-### 7.3 Update URLs Again
+### 5.3 Update URLs Again
 
 Update Supabase and Google OAuth with your custom domain:
 
@@ -354,7 +344,7 @@ Update Supabase and Google OAuth with your custom domain:
 
 ---
 
-## Step 8: Verify Deployment
+## Step 6: Verify Deployment
 
 ### Checklist
 
@@ -386,8 +376,8 @@ Update Supabase and Google OAuth with your custom domain:
 
 ### Chat not responding
 
-- Check Groq API key is valid
-- Check Gemini API key as fallback
+- Check Azure AI Foundry credentials and deployment names
+- Verify `AZURE_OPENAI_CHAT_DEPLOYMENT` is set correctly
 
 ### Build fails on DigitalOcean
 
@@ -398,14 +388,12 @@ Update Supabase and Google OAuth with your custom domain:
 
 ## Cost Summary (with Student Pack)
 
-| Service      | Free Tier / Credits                        |
-| ------------ | ------------------------------------------ |
-| Supabase     | Free tier (500MB database, 1GB storage)    |
-| Azure OpenAI | $100 credits (lasts months for embeddings) |
-| Groq         | Free tier (generous rate limits)           |
-| Gemini       | Free tier (generous rate limits)           |
-| DigitalOcean | $200 credits (40 months at $5/mo)          |
-| .TECH Domain | 1 year free                                |
+| Service          | Free Tier / Credits                          |
+| ---------------- | -------------------------------------------- |
+| Supabase         | Free tier (500MB database, 1GB storage)      |
+| Azure AI Foundry | $100-$200 credits (covers chat + embeddings) |
+| DigitalOcean     | $200 credits (40 months at $5/mo)            |
+| .TECH Domain     | 1 year free                                  |
 
 **Total cost: $0** for the first year!
 
