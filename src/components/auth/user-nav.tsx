@@ -1,7 +1,6 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,7 +18,6 @@ interface UserNavProps {
 }
 
 export function UserNav({ user }: UserNavProps) {
-  const router = useRouter();
   const { toast } = useToast();
   const supabase = createClient();
 
