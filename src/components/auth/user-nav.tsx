@@ -30,14 +30,14 @@ export function UserNav({ user }: UserNavProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+        <Button variant="ghost" className="relative h-10 w-10 overflow-hidden rounded-full p-0">
           {user.user_metadata?.avatar_url ? (
             <Image
               src={user.user_metadata.avatar_url}
               alt={user.email || 'User'}
-              width={40}
-              height={40}
-              className="rounded-full"
+              fill
+              className="rounded-full object-cover"
+              sizes="40px"
             />
           ) : (
             <UserIcon className="h-5 w-5" />
