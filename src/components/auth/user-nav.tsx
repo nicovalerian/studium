@@ -42,8 +42,8 @@ export function UserNav({ user }: UserNavProps) {
         description: 'You have been signed out successfully.',
       });
 
-      router.push('/login');
-      router.refresh();
+      // Hard redirect to login page
+      window.location.href = '/login';
     } catch (error) {
       console.error('Unexpected error during sign out:', error);
       toast({
