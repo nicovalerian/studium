@@ -1,7 +1,7 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { chunkText } from './chunker';
-import { generateEmbedding } from './azure-openai';
+import { generateEmbedding } from './huggingface';
 
 const STUCK_THRESHOLD_MS = 20 * 60 * 1000;
 
@@ -60,7 +60,11 @@ export async function generateDocumentEmbeddings(
   }
 
   try {
-    await serviceSupabase.from('document_chunks').delete().eq('document_id', documentId).throwOnError();
+    await serviceSupabase
+      .from('document_chunks')
+      .delete()
+      .eq('document_id', documentId)
+      .throwOnError();
 
     const chunks = chunkText(content);
     for (let index = 0; index < chunks.length; index++) {
@@ -89,7 +93,8 @@ export async function generateDocumentEmbeddings(
 
     return { embedding_status: 'completed' };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error during embedding generation';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error during embedding generation';
 
     await userSupabase
       .from('documents')

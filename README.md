@@ -14,7 +14,8 @@ An AI-powered study companion that helps you learn from your documents. Upload P
 - **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
 - **Backend**: Next.js API Routes
 - **Database**: Supabase (PostgreSQL with pgvector)
-- **AI**: Azure AI Foundry (GPT-5-nano for chat, text-embedding-3-small for embeddings)
+- **AI Chat**: DigitalOcean Gradient AI Platform (Llama 3.3 70B via Serverless Inference)
+- **Embeddings**: HuggingFace Inference API (all-MiniLM-L6-v2)
 - **Authentication**: Supabase Auth with Google OAuth
 - **Deployment**: DigitalOcean App Platform
 
@@ -23,7 +24,8 @@ An AI-powered study companion that helps you learn from your documents. Upload P
 ### Prerequisites
 
 - Node.js 18+
-- Azure account with AI Foundry access
+- DigitalOcean account (with Gradient AI Platform access)
+- HuggingFace account (free)
 - Supabase account
 
 ### 1. Clone and Install
@@ -48,11 +50,13 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
-# Azure AI Foundry
-AZURE_OPENAI_API_KEY=your-azure-key
-AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
-AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
-AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-nano
+# DigitalOcean Gradient AI Platform
+DO_GRADIENT_API_KEY=your-do-gradient-api-key
+DO_GRADIENT_CHAT_MODEL=llama3.3-70b-instruct
+
+# HuggingFace
+HUGGINGFACE_API_KEY=hf_your-token
+HUGGINGFACE_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
 ```
 
 ### 3. Set Up Supabase
@@ -62,14 +66,20 @@ AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-nano
 3. Create a `documents` storage bucket (private)
 4. Run `supabase/storage-policies.sql` in the SQL Editor
 
-### 4. Set Up Azure AI Foundry
+### 4. Set Up DigitalOcean Gradient AI Platform
 
-1. Create an Azure AI Foundry resource
-2. Deploy `gpt-5-nano` model with deployment name `gpt-5-nano`
-3. Deploy `text-embedding-3-small` model with deployment name `text-embedding-3-small`
-4. Copy the endpoint and API key from Keys and Endpoint
+1. Go to [DigitalOcean Gradient AI Platform](https://cloud.digitalocean.com/gen-ai)
+2. Navigate to **Serverless Inference** tab
+3. Create a **Model Access Key**
+4. Copy the key to `DO_GRADIENT_API_KEY`
 
-### 5. Run Development Server
+### 5. Set Up HuggingFace
+
+1. Go to [HuggingFace Settings](https://huggingface.co/settings/tokens)
+2. Create a new access token (read permissions)
+3. Copy the token to `HUGGINGFACE_API_KEY`
+
+### 6. Run Development Server
 
 ```bash
 npm run dev
@@ -100,8 +110,8 @@ src/
 │   └── login/             # Login page
 ├── components/            # React components
 ├── lib/                   # Shared utilities
-│   ├── ai/               # AI service (Azure Foundry provider)
-│   ├── embeddings/       # Embedding generation and search
+│   ├── ai/               # AI service (DO Gradient provider)
+│   ├── embeddings/       # Embedding generation (HuggingFace)
 │   ├── file-processing/  # PDF and DOCX parsing
 │   ├── flashcards/       # Flashcard generation
 │   └── supabase/         # Supabase client utilities

@@ -1,25 +1,25 @@
-import { chatWithAzureFoundry } from './providers/azure-foundry';
+import { chatWithDOGradient } from './providers/do-gradient';
 import { generateMockChatResponse } from './providers/mock';
 import { buildSystemPrompt } from './prompts';
 import type { ChatRequest, ChatResponse } from './types';
 
 const rateLimitState = {
-  azure: { retryAfter: 0, timestamp: 0 },
+  doGradient: { retryAfter: 0, timestamp: 0 },
 };
 
 function isProviderAvailable(): boolean {
-  const state = rateLimitState.azure;
+  const state = rateLimitState.doGradient;
   if (state.timestamp === 0) return true;
   const elapsed = (Date.now() - state.timestamp) / 1000;
   return elapsed >= state.retryAfter;
 }
 
 function setRateLimit(retryAfter: number): void {
-  rateLimitState.azure = { retryAfter, timestamp: Date.now() };
+  rateLimitState.doGradient = { retryAfter, timestamp: Date.now() };
 }
 
 function getRemainingWait(): number {
-  const state = rateLimitState.azure;
+  const state = rateLimitState.doGradient;
   if (state.timestamp === 0) return 0;
   const elapsed = (Date.now() - state.timestamp) / 1000;
   return Math.max(0, Math.ceil(state.retryAfter - elapsed));
@@ -38,11 +38,11 @@ export async function chat(request: ChatRequest): Promise<ChatResponse> {
     return {
       rateLimited: true,
       retryAfter: getRemainingWait(),
-      provider: 'azure',
+      provider: 'do-gradient',
     };
   }
 
-  const result = await chatWithAzureFoundry(systemPrompt, history, message);
+  const result = await chatWithDOGradient(systemPrompt, history, message);
 
   if (!result.rateLimited) {
     return { content: result.content, rateLimited: false };
@@ -52,6 +52,6 @@ export async function chat(request: ChatRequest): Promise<ChatResponse> {
   return {
     rateLimited: true,
     retryAfter: result.retryAfter,
-    provider: 'azure',
+    provider: 'do-gradient',
   };
 }

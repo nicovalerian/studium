@@ -33,96 +33,8 @@ This guide walks you through deploying Studium to production using free-tier ser
 
 1. Go to **SQL Editor** in Supabase dashboard
 2. Click **New query**
-3. Paste and run this SQL:
-
-```sql
--- Enable pgvector extension
-create extension if not exists vector;
-
--- Classes table
-create table classes (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users(id) on delete cascade not null,
-  name text not null,
-  created_at timestamptz default now()
-);
-
--- Documents table
-create table documents (
-  id uuid primary key default gen_random_uuid(),
-  class_id uuid references classes(id) on delete cascade not null,
-  user_id uuid references auth.users(id) on delete cascade not null,
-  filename text not null,
-  display_name text,
-  file_path text not null,
-  content text,
-  embedding_status text default 'pending' check (embedding_status in ('pending', 'processing', 'completed', 'failed')),
-  embedding_version integer default 0,
-  created_at timestamptz default now()
-);
-
--- Document chunks with embeddings
-create table document_chunks (
-  id uuid primary key default gen_random_uuid(),
-  document_id uuid references documents(id) on delete cascade not null,
-  chunk_index integer not null,
-  content text not null,
-  embedding vector(1536),
-  created_at timestamptz default now()
-);
-
--- Flashcards table
-create table flashcards (
-  id uuid primary key default gen_random_uuid(),
-  class_id uuid references classes(id) on delete cascade not null,
-  user_id uuid references auth.users(id) on delete cascade not null,
-  front text not null,
-  back text not null,
-  created_at timestamptz default now()
-);
-
--- Messages table (chat history)
-create table messages (
-  id uuid primary key default gen_random_uuid(),
-  class_id uuid references classes(id) on delete cascade not null,
-  user_id uuid references auth.users(id) on delete cascade not null,
-  role text not null check (role in ('user', 'assistant')),
-  content text not null,
-  created_at timestamptz default now()
-);
-
--- Create indexes
-create index on document_chunks using ivfflat (embedding vector_cosine_ops) with (lists = 100);
-create index on documents (class_id);
-create index on documents (user_id);
-create index on flashcards (class_id);
-create index on messages (class_id);
-
--- Enable Row Level Security
-alter table classes enable row level security;
-alter table documents enable row level security;
-alter table document_chunks enable row level security;
-alter table flashcards enable row level security;
-alter table messages enable row level security;
-
--- RLS Policies: Users can only access their own data
-create policy "Users can CRUD their own classes"
-  on classes for all using (auth.uid() = user_id);
-
-create policy "Users can CRUD their own documents"
-  on documents for all using (auth.uid() = user_id);
-
-create policy "Users can access chunks of their documents"
-  on document_chunks for all using (
-    document_id in (select id from documents where user_id = auth.uid())
-  );
-
-create policy "Users can CRUD their own flashcards"
-  on flashcards for all using (auth.uid() = user_id);
-
-create policy "Users can CRUD their own messages"
-  on messages for all using (auth.uid() = user_id);
-```
+3. Copy the contents of `supabase/schema.sql` from the repository and run it
+4. This creates all tables with proper RLS policies and vector support (384 dimensions for HuggingFace embeddings)
 
 ### 1.4 Set Up Storage Bucket
 
@@ -131,20 +43,7 @@ create policy "Users can CRUD their own messages"
 3. Name it `documents`
 4. Uncheck "Public bucket" (keep it private)
 5. Click **Create bucket**
-6. Click on the bucket, then **Policies**
-7. Add these policies:
-
-**Policy 1 - Upload:**
-
-- Policy name: `Users can upload to their folder`
-- Allowed operation: `INSERT`
-- Policy definition: `(auth.uid())::text = (storage.foldername(name))[1]`
-
-**Policy 2 - Read:**
-
-- Policy name: `Users can read their files`
-- Allowed operation: `SELECT`
-- Policy definition: `(auth.uid())::text = (storage.foldername(name))[1]`
+6. Go to **SQL Editor** and run the contents of `supabase/storage-policies.sql`
 
 ### 1.5 Set Up Google OAuth
 
@@ -177,66 +76,72 @@ create policy "Users can CRUD their own messages"
 
 ---
 
-## Step 2: Azure AI Foundry Setup (GitHub Student Pack)
+## Step 2: DigitalOcean Gradient AI Platform Setup
 
-### 2.1 Claim Azure Credits
+DigitalOcean's Gradient AI Platform provides serverless inference for AI models. We'll use it for the chat functionality with Llama 3.3 70B.
 
-1. Go to [GitHub Student Developer Pack](https://education.github.com/pack)
-2. Find **Microsoft Azure** and click to claim
-3. You'll get $100-$200 in Azure credits
-
-### 2.2 Create Azure AI Foundry Resource
-
-1. Go to [Azure Portal](https://portal.azure.com)
-2. Search for **Azure AI services** or **Microsoft Foundry** and click **Create**
-3. Fill in:
-   - Subscription: Your student subscription
-   - Resource group: Create new → `studium-rg`
-   - Region: `Southeast Asia` (or closest to your users)
-   - Name: `studium-ai`
-   - Pricing tier: `Standard S0`
-4. Click **Review + create** → **Create**
-5. Wait for deployment (~2 minutes)
-
-### 2.3 Deploy Models
-
-1. Go to [Azure AI Foundry Portal](https://ai.azure.com)
-2. Select your resource
-3. Go to **Model Deployments** → **Deploy model**
-
-**Deploy Chat Model:**
-
-- Model: `gpt-5-nano`
-- Deployment name: `gpt-5-nano` (use this exact name)
-- Click **Deploy**
-
-**Deploy Embedding Model:**
-
-- Model: `text-embedding-3-small`
-- Deployment name: `text-embedding-3-small`
-- Click **Deploy**
-
-### 2.4 Get API Keys
-
-1. In Azure Portal, go to your AI Foundry resource
-2. Click **Keys and Endpoint**
-3. Copy:
-   - `KEY 1` → This is your `AZURE_OPENAI_API_KEY`
-   - `Endpoint` → This is your `AZURE_OPENAI_ENDPOINT`
-4. Your deployment names are:
-   - `AZURE_OPENAI_CHAT_DEPLOYMENT` = `gpt-5-nano`
-   - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` = `text-embedding-3-small`
-
----
-
-## Step 3: Deploy to DigitalOcean App Platform
-
-### 3.1 Claim DigitalOcean Credits
+### 2.1 Claim DigitalOcean Credits
 
 1. Go to [GitHub Student Developer Pack](https://education.github.com/pack)
 2. Find **DigitalOcean** and claim $200 credits
 
-### 3.2 Push Code to GitHub
+### 2.2 Access Gradient AI Platform
+
+1. Go to [DigitalOcean Cloud Console](https://cloud.digitalocean.com)
+2. In the left sidebar, click **Gradient AI Platform** (or search for "GenAI")
+3. Navigate to the **Serverless Inference** tab
+
+### 2.3 Create Model Access Key
+
+1. In Serverless Inference, click **Create Access Key** or **Manage Keys**
+2. Give your key a name: `studium-key`
+3. Click **Create**
+4. **Important**: Copy the key immediately - you won't be able to see it again!
+5. Save this as your `DO_GRADIENT_API_KEY`
+
+### 2.4 Available Models
+
+The default model is `llama3.3-70b-instruct`. Other available models include:
+
+- `llama3.3-70b-instruct` (recommended - best quality)
+- `llama3.1-8b-instruct` (faster, lower cost)
+- `mistral-nemo-instruct-2407`
+- `deepseek-r1-distill-llama-70b`
+
+You can change the model by setting `DO_GRADIENT_CHAT_MODEL` in your environment variables.
+
+---
+
+## Step 3: HuggingFace Setup (Embeddings)
+
+HuggingFace provides free API access for generating embeddings used in semantic search.
+
+### 3.1 Create HuggingFace Account
+
+1. Go to [huggingface.co](https://huggingface.co) and sign up (free)
+
+### 3.2 Create Access Token
+
+1. Go to [Settings → Access Tokens](https://huggingface.co/settings/tokens)
+2. Click **New token**
+3. Give it a name: `studium`
+4. Select **Read** permission (that's all we need)
+5. Click **Create**
+6. Copy the token - this is your `HUGGINGFACE_API_KEY`
+
+### 3.3 Model Information
+
+We use `sentence-transformers/all-MiniLM-L6-v2` for embeddings:
+
+- **Dimensions**: 384 (configured in database schema)
+- **Free tier**: Generous rate limits for personal projects
+- **Speed**: Fast inference times
+
+---
+
+## Step 4: Deploy to DigitalOcean App Platform
+
+### 4.1 Push Code to GitHub
 
 ```bash
 cd C:\Users\nico\Documents\Studium
@@ -253,7 +158,7 @@ git branch -M main
 git push -u origin main
 ```
 
-### 3.3 Create DigitalOcean App
+### 4.2 Create DigitalOcean App
 
 1. Go to [cloud.digitalocean.com/apps](https://cloud.digitalocean.com/apps)
 2. Click **Create App**
@@ -262,7 +167,7 @@ git push -u origin main
 5. Branch: `main`
 6. Click **Next**
 
-### 3.4 Configure Build Settings
+### 4.3 Configure Build Settings
 
 1. Resource Type: **Web Service**
 2. Build Command: `npm run build`
@@ -270,23 +175,23 @@ git push -u origin main
 4. HTTP Port: `3000`
 5. Instance Size: **Basic** ($5/month, covered by credits)
 
-### 3.5 Add Environment Variables
+### 4.4 Add Environment Variables
 
 Click **Edit** next to Environment Variables and add ALL of these:
 
-| Variable                            | Value                          |
-| ----------------------------------- | ------------------------------ |
-| `NEXT_PUBLIC_SUPABASE_URL`          | Your Supabase project URL      |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY`     | Your Supabase anon key         |
-| `SUPABASE_SERVICE_ROLE_KEY`         | Your Supabase service role     |
-| `AZURE_OPENAI_API_KEY`              | Your Azure AI Foundry key      |
-| `AZURE_OPENAI_ENDPOINT`             | Your Azure AI Foundry endpoint |
-| `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` | `text-embedding-3-small`       |
-| `AZURE_OPENAI_CHAT_DEPLOYMENT`      | `gpt-5-nano`                   |
+| Variable                        | Value                                               |
+| ------------------------------- | --------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Your Supabase project URL                           |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon key                              |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Your Supabase service role key                      |
+| `DO_GRADIENT_API_KEY`           | Your DigitalOcean Gradient access key               |
+| `DO_GRADIENT_CHAT_MODEL`        | `llama3.3-70b-instruct` (optional)                  |
+| `HUGGINGFACE_API_KEY`           | Your HuggingFace access token                       |
+| `HUGGINGFACE_EMBEDDING_MODEL`   | `sentence-transformers/all-MiniLM-L6-v2` (optional) |
 
-Mark sensitive keys as **Encrypted**.
+Mark sensitive keys (`SUPABASE_SERVICE_ROLE_KEY`, `DO_GRADIENT_API_KEY`, `HUGGINGFACE_API_KEY`) as **Encrypted**.
 
-### 3.6 Deploy
+### 4.5 Deploy
 
 1. Click **Next** through remaining steps
 2. Review and click **Create Resources**
@@ -295,16 +200,16 @@ Mark sensitive keys as **Encrypted**.
 
 ---
 
-## Step 4: Update OAuth Redirect URLs
+## Step 5: Update OAuth Redirect URLs
 
-### 4.1 Update Supabase
+### 5.1 Update Supabase
 
 1. Go to Supabase → **Authentication** → **URL Configuration**
 2. Update **Site URL** to your DigitalOcean URL
 3. Add to **Redirect URLs**:
    - `https://studium-xxxxx.ondigitalocean.app/auth/callback`
 
-### 4.2 Update Google OAuth
+### 5.2 Update Google OAuth
 
 1. Go to Google Cloud Console → **Credentials**
 2. Edit your OAuth client
@@ -315,15 +220,15 @@ Mark sensitive keys as **Encrypted**.
 
 ---
 
-## Step 5: Custom Domain (Optional)
+## Step 6: Custom Domain (Optional)
 
-### 5.1 Claim .TECH Domain
+### 6.1 Claim .TECH Domain
 
 1. Go to [GitHub Student Developer Pack](https://education.github.com/pack)
 2. Find **.TECH Domains** and claim a free domain
 3. Register `studium.tech` (or similar)
 
-### 5.2 Configure DNS
+### 6.2 Configure DNS
 
 1. In your .TECH domain dashboard, add DNS records:
    - Type: `CNAME`
@@ -335,7 +240,7 @@ Mark sensitive keys as **Encrypted**.
    - Add your custom domain
    - DigitalOcean will auto-provision SSL
 
-### 5.3 Update URLs Again
+### 6.3 Update URLs Again
 
 Update Supabase and Google OAuth with your custom domain:
 
@@ -344,7 +249,7 @@ Update Supabase and Google OAuth with your custom domain:
 
 ---
 
-## Step 6: Verify Deployment
+## Step 7: Verify Deployment
 
 ### Checklist
 
@@ -371,13 +276,21 @@ Update Supabase and Google OAuth with your custom domain:
 
 ### Documents stuck in "Processing"
 
-- Check Azure OpenAI credentials
-- Verify embedding deployment name matches exactly
+- Check HuggingFace API key is set correctly
+- Verify the model `sentence-transformers/all-MiniLM-L6-v2` is accessible
+- Check DigitalOcean App logs for embedding errors
 
 ### Chat not responding
 
-- Check Azure AI Foundry credentials and deployment names
-- Verify `AZURE_OPENAI_CHAT_DEPLOYMENT` is set correctly
+- Check DO Gradient API key is set correctly
+- Verify the key has access to serverless inference
+- Check DigitalOcean App logs for API errors
+
+### Rate limit errors from HuggingFace
+
+- HuggingFace free tier has generous limits but can throttle during high usage
+- Wait a few minutes and try again
+- Consider upgrading to HuggingFace Pro for higher limits
 
 ### Build fails on DigitalOcean
 
@@ -388,14 +301,31 @@ Update Supabase and Google OAuth with your custom domain:
 
 ## Cost Summary (with Student Pack)
 
-| Service          | Free Tier / Credits                          |
-| ---------------- | -------------------------------------------- |
-| Supabase         | Free tier (500MB database, 1GB storage)      |
-| Azure AI Foundry | $100-$200 credits (covers chat + embeddings) |
-| DigitalOcean     | $200 credits (40 months at $5/mo)            |
-| .TECH Domain     | 1 year free                                  |
+| Service                   | Free Tier / Credits                              |
+| ------------------------- | ------------------------------------------------ |
+| Supabase                  | Free tier (500MB database, 1GB storage)          |
+| DigitalOcean App Platform | $200 credits (40 months at $5/mo)                |
+| DigitalOcean Gradient AI  | Pay-per-use from $200 credits (~$0.65/1M tokens) |
+| HuggingFace               | Free tier (generous rate limits)                 |
+| .TECH Domain              | 1 year free                                      |
 
 **Total cost: $0** for the first year!
+
+---
+
+## API Pricing Reference
+
+### DigitalOcean Gradient AI (Serverless Inference)
+
+| Model                  | Input (per 1M tokens) | Output (per 1M tokens) |
+| ---------------------- | --------------------- | ---------------------- |
+| Llama 3.3 70B Instruct | $0.35                 | $0.65                  |
+| Llama 3.1 8B Instruct  | $0.04                 | $0.07                  |
+
+### HuggingFace Inference API
+
+- **Free tier**: Rate-limited but sufficient for personal projects
+- **Pro tier**: $9/month for higher rate limits if needed
 
 ---
 
@@ -406,4 +336,4 @@ Update Supabase and Google OAuth with your custom domain:
 3. Add more AI features (quiz generation, study scheduling)
 4. Share your project link in your portfolio!
 
-Congratulations! Your AI Study Buddy is now live! 🎉
+Congratulations! Your AI Study Buddy is now live!

@@ -17,7 +17,7 @@ export interface ChatSuccess {
 export interface ChatRateLimited {
   rateLimited: true;
   retryAfter: number;
-  provider: 'azure';
+  provider: 'do-gradient';
 }
 
 export type ChatResponse = ChatSuccess | ChatRateLimited;

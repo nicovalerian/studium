@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { generateEmbedding } from './azure-openai';
+import { generateEmbedding } from './huggingface';
 import type { DocumentChunk } from '../ai/types';
 
 const MAX_CONTEXT_LENGTH = 4000;

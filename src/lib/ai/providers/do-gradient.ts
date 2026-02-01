@@ -1,49 +1,48 @@
-import { AzureOpenAI } from 'openai';
+import OpenAI from 'openai';
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 import type { ChatMessage } from '../types';
 
-let client: AzureOpenAI | null = null;
+const DO_GRADIENT_BASE_URL = 'https://inference.do-ai.run/v1';
+const DEFAULT_MODEL = 'llama3.3-70b-instruct';
 
-function getClient(): AzureOpenAI {
+let client: OpenAI | null = null;
+
+function getClient(): OpenAI {
   if (!client) {
-    if (!process.env.AZURE_OPENAI_API_KEY) {
-      throw new Error('Missing AZURE_OPENAI_API_KEY');
-    }
-    if (!process.env.AZURE_OPENAI_ENDPOINT) {
-      throw new Error('Missing AZURE_OPENAI_ENDPOINT');
-    }
-    if (!process.env.AZURE_OPENAI_CHAT_DEPLOYMENT) {
-      throw new Error('Missing AZURE_OPENAI_CHAT_DEPLOYMENT');
+    if (!process.env.DO_GRADIENT_API_KEY) {
+      throw new Error('Missing DO_GRADIENT_API_KEY');
     }
 
-    client = new AzureOpenAI({
-      apiKey: process.env.AZURE_OPENAI_API_KEY,
-      endpoint: process.env.AZURE_OPENAI_ENDPOINT,
-      deployment: process.env.AZURE_OPENAI_CHAT_DEPLOYMENT,
-      apiVersion: '2024-10-01-preview',
+    client = new OpenAI({
+      apiKey: process.env.DO_GRADIENT_API_KEY,
+      baseURL: DO_GRADIENT_BASE_URL,
     });
   }
   return client;
 }
 
-export interface AzureFoundryResult {
+function getModel(): string {
+  return process.env.DO_GRADIENT_CHAT_MODEL || DEFAULT_MODEL;
+}
+
+export interface DOGradientResult {
   content: string;
   rateLimited: false;
 }
 
-export interface AzureFoundryRateLimited {
+export interface DOGradientRateLimited {
   rateLimited: true;
   retryAfter: number;
 }
 
-export type AzureFoundryResponse = AzureFoundryResult | AzureFoundryRateLimited;
+export type DOGradientResponse = DOGradientResult | DOGradientRateLimited;
 
-export async function chatWithAzureFoundry(
+export async function chatWithDOGradient(
   systemPrompt: string,
   history: ChatMessage[],
   userMessage: string
-): Promise<AzureFoundryResponse> {
-  const azure = getClient();
+): Promise<DOGradientResponse> {
+  const openai = getClient();
 
   const messages: ChatCompletionMessageParam[] = [
     { role: 'system', content: systemPrompt },
@@ -52,8 +51,8 @@ export async function chatWithAzureFoundry(
   ];
 
   try {
-    const completion = await azure.chat.completions.create({
-      model: process.env.AZURE_OPENAI_CHAT_DEPLOYMENT!,
+    const completion = await openai.chat.completions.create({
+      model: getModel(),
       messages,
       max_tokens: 2048,
       temperature: 0.7,

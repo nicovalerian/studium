@@ -33,12 +33,12 @@ CREATE TABLE documents (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Document chunks with embeddings (1536 dimensions for Azure OpenAI)
+-- Document chunks with embeddings (384 dimensions for HuggingFace all-MiniLM-L6-v2)
 CREATE TABLE document_chunks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   document_id UUID NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
-  embedding vector(1536),
+  embedding vector(384),
   chunk_index INTEGER NOT NULL,
   created_at TIMESTAMPTZ DEFAULT now(),
   CONSTRAINT document_chunks_unique_index UNIQUE (document_id, chunk_index)
@@ -69,7 +69,7 @@ CREATE INDEX ON document_chunks USING ivfflat (embedding vector_cosine_ops) WITH
 
 -- Vector similarity search function
 CREATE OR REPLACE FUNCTION match_document_chunks(
-  query_embedding vector(1536),
+  query_embedding vector(384),
   match_threshold FLOAT,
   match_count INT,
   filter_class_id UUID

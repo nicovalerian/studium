@@ -1,4 +1,4 @@
-const MOCK_EMBEDDING = new Array(1536).fill(0.1);
+const MOCK_EMBEDDING = new Array(384).fill(0.1);
 
 export async function generateMockEmbedding(): Promise<number[]> {
   return MOCK_EMBEDDING;
