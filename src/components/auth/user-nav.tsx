@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { User } from '@supabase/supabase-js';
 import { LogOut, User as UserIcon } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface UserNavProps {
   user: User;
@@ -19,12 +20,38 @@ interface UserNavProps {
 
 export function UserNav({ user }: UserNavProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const supabase = createClient();
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push('/login');
-    router.refresh();
+    try {
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        console.error('Sign out error:', error);
+        toast({
+          title: 'Error signing out',
+          description: error.message,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      toast({
+        title: 'Signed out',
+        description: 'You have been signed out successfully.',
+      });
+
+      router.push('/login');
+      router.refresh();
+    } catch (error) {
+      console.error('Unexpected error during sign out:', error);
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (

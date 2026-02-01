@@ -59,7 +59,16 @@ export async function POST(request: Request) {
   const chunks = await searchSimilarChunks(supabase, class_id, message);
   const context = buildContext(chunks);
 
-  const aiResponse = await chat({ context, history, message });
+  let aiResponse;
+  try {
+    aiResponse = await chat({ context, history, message });
+  } catch (error) {
+    console.error('AI chat error:', error);
+    return NextResponse.json(
+      { error: 'AI service unavailable. Please check your API configuration.' },
+      { status: 503 }
+    );
+  }
 
   if (aiResponse.rateLimited) {
     return NextResponse.json(
