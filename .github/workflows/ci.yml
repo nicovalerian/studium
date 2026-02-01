@@ -12,25 +12,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: '20'
+          cache: 'npm'
 
-      - run: bun install
+      - run: npm ci
 
-      - run: bun run lint
+      - run: npm run lint
 
-      - run: bun run test:run
+      - run: npm run test:run
 
-      - run: bun run build
+      - run: npm run build
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-for-build
-          AZURE_OPENAI_API_KEY: placeholder-for-build
-          AZURE_OPENAI_ENDPOINT: https://placeholder.openai.azure.com
-          AZURE_OPENAI_EMBEDDING_DEPLOYMENT: text-embedding-3-small
-          GROQ_API_KEY: placeholder-for-build
-          GOOGLE_GENERATIVE_AI_API_KEY: placeholder-for-build
+          DO_GRADIENT_API_KEY: placeholder-for-build
+          DO_GRADIENT_CHAT_MODEL: llama3.3-70b-instruct
+          HUGGINGFACE_API_KEY: placeholder-for-build
+          HUGGINGFACE_EMBEDDING_MODEL: sentence-transformers/all-MiniLM-L6-v2
 
   e2e:
     runs-on: ubuntu-latest
@@ -41,24 +41,24 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      AZURE_OPENAI_API_KEY: placeholder-for-build
-      AZURE_OPENAI_ENDPOINT: https://placeholder.openai.azure.com
-      AZURE_OPENAI_EMBEDDING_DEPLOYMENT: text-embedding-3-small
-      GROQ_API_KEY: placeholder-for-build
-      GOOGLE_GENERATIVE_AI_API_KEY: placeholder-for-build
+      DO_GRADIENT_API_KEY: placeholder-for-build
+      DO_GRADIENT_CHAT_MODEL: llama3.3-70b-instruct
+      HUGGINGFACE_API_KEY: placeholder-for-build
+      HUGGINGFACE_EMBEDDING_MODEL: sentence-transformers/all-MiniLM-L6-v2
       TEST_USER_EMAIL: test@studium.local
       TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: '20'
+          cache: 'npm'
 
-      - run: bun install
+      - run: npm ci
 
-      - run: bunx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium
 
-      - run: bun run build
+      - run: npm run build
 
-      - run: bun run e2e
+      - run: npm run e2e
