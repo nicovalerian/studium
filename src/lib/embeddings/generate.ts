@@ -46,6 +46,55 @@ export async function generateDocumentEmbeddings(
   const processingTimestamp = new Date().toISOString();
   const stuckThreshold = new Date(Date.now() - STUCK_THRESHOLD_MS).toISOString();
 
+  // Step 1: Fetch current document state
+  const { data: currentDoc, error: currentDocError } = await serviceSupabase
+    .from('documents')
+    .select('embedding_status, processing_started_at')
+    .eq('id', documentId)
+    .maybeSingle();
+
+  if (currentDocError) {
+    console.error('Embedding claim fetch error:', currentDocError);
+    await markDocumentFailed(
+      serviceSupabase,
+      documentId,
+      `Failed to fetch document for processing: ${currentDocError.message}`
+    );
+    return {
+      embedding_status: 'failed',
+      error_message: `Database error: ${currentDocError.message}`,
+    };
+  }
+
+  if (!currentDoc) {
+    return {
+      embedding_status: 'failed',
+      error_message: 'Document not found for processing',
+    };
+  }
+
+  const status = currentDoc.embedding_status;
+  const processingStartedAt = currentDoc.processing_started_at
+    ? new Date(currentDoc.processing_started_at).toISOString()
+    : null;
+
+  const canReclaimProcessing =
+    status === 'processing' &&
+    processingStartedAt &&
+    new Date(processingStartedAt).getTime() < new Date(stuckThreshold).getTime();
+
+  // Step 2: Check eligibility before claiming
+  if (status !== 'pending' && status !== 'failed' && !canReclaimProcessing) {
+    return {
+      embedding_status: status === 'completed' ? 'completed' : 'processing',
+      error_message:
+        status === 'completed'
+          ? undefined
+          : 'Document is already being processed by another request',
+    };
+  }
+
+  // Step 3: Claim with simple equality check (no OR filter)
   const { data: claimed, error: claimError } = await serviceSupabase
     .from('documents')
     .update({
@@ -54,9 +103,7 @@ export async function generateDocumentEmbeddings(
       updated_at: processingTimestamp,
     })
     .eq('id', documentId)
-    .or(
-      `embedding_status.eq.pending,embedding_status.eq.failed,and(embedding_status.eq.processing,processing_started_at.lt.${stuckThreshold})`
-    )
+    .eq('embedding_status', status)
     .select('id')
     .maybeSingle();
 
@@ -74,7 +121,6 @@ export async function generateDocumentEmbeddings(
   }
 
   if (!claimed) {
-    console.log('Document not claimed - already being processed or not eligible');
     return {
       embedding_status: 'processing',
       error_message: 'Document is already being processed by another request',

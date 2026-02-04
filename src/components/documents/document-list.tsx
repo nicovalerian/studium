@@ -249,7 +249,7 @@ export function DocumentList({ documents, onDocumentsDeleted }: DocumentListProp
                 <p className="font-medium text-[hsl(var(--warm-800))]">
                   {doc.display_name || doc.filename}
                 </p>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-1">
                   <p className="text-xs text-[hsl(var(--warm-500))]">
                     {new Date(doc.created_at).toLocaleDateString()}
                   </p>
