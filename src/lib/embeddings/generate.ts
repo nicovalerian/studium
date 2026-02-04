@@ -1,5 +1,4 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js';
-import { SupabaseClient } from '@supabase/supabase-js';
 import { chunkText } from './chunker';
 import { generateEmbedding } from './huggingface';
 
@@ -26,7 +25,7 @@ async function withRetry<T>(
 }
 
 export async function generateDocumentEmbeddings(
-  userSupabase: SupabaseClient,
+  _userSupabase: unknown,
   documentId: string,
   content: string
 ): Promise<{ embedding_status: 'completed' | 'failed'; error_message?: string }> {
@@ -38,7 +37,7 @@ export async function generateDocumentEmbeddings(
   const processingTimestamp = new Date().toISOString();
   const stuckThreshold = new Date(Date.now() - STUCK_THRESHOLD_MS).toISOString();
 
-  const { data: claimed, error: claimError } = await userSupabase
+  const { data: claimed, error: claimError } = await serviceSupabase
     .from('documents')
     .update({
       embedding_status: 'processing',
@@ -53,6 +52,9 @@ export async function generateDocumentEmbeddings(
     .single();
 
   if (claimError || !claimed) {
+    if (claimError) {
+      console.error('Embedding claim error:', claimError);
+    }
     return {
       embedding_status: 'failed',
       error_message: 'Document is already being processed',
@@ -81,7 +83,7 @@ export async function generateDocumentEmbeddings(
         .throwOnError();
     }
 
-    await userSupabase
+    await serviceSupabase
       .from('documents')
       .update({
         embedding_status: 'completed',
@@ -96,7 +98,7 @@ export async function generateDocumentEmbeddings(
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error during embedding generation';
 
-    await userSupabase
+    await serviceSupabase
       .from('documents')
       .update({
         embedding_status: 'failed',

@@ -138,17 +138,25 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
         body: JSON.stringify({ class_id: classId, message: content }),
       });
 
-      const data = await response.json();
+      let data: Record<string, unknown> = {};
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        try {
+          data = await response.json();
+        } catch (error) {
+          console.error('Failed to parse chat response JSON:', error);
+          throw new Error('Invalid server response. Please try again.');
+        }
+      }
 
       if (!response.ok) {
         if (response.status === 429) {
-          setRateLimit({
-            retryAfter: data.retry_after,
-            provider: data.provider,
-          });
+          const retryAfter = typeof data.retry_after === 'number' ? data.retry_after : 60;
+          const provider = typeof data.provider === 'string' ? data.provider : 'do-gradient';
+          setRateLimit({ retryAfter, provider });
           toast({
             title: 'Rate limit reached',
-            description: `Please wait ${data.retry_after} seconds before sending another message.`,
+            description: `Please wait ${retryAfter} seconds before sending another message.`,
             variant: 'destructive',
           });
         } else if (response.status === 401) {
@@ -159,12 +167,14 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
           });
           router.push('/login');
         } else {
-          throw new Error(data.error || 'Failed to send message');
+          const serverError = typeof data.error === 'string' ? data.error : null;
+          throw new Error(serverError || `Failed to send message (${response.status}).`);
         }
         return;
       }
 
-      const assistantMessage: MessageProps = { role: 'assistant', content: data.content };
+      const assistantContent = typeof data.content === 'string' ? data.content : '';
+      const assistantMessage: MessageProps = { role: 'assistant', content: assistantContent };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
