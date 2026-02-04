@@ -254,7 +254,7 @@ export function DocumentList({ documents, onDocumentsDeleted }: DocumentListProp
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="relative z-10 flex items-center gap-2">
               <StatusBadge status={doc.embedding_status} />
               <AlertDialog
                 open={singleDeleteId === doc.id}

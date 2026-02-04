@@ -224,7 +224,7 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
         </header>
 
         <div className="flex flex-1 overflow-hidden">
-          <aside className="flex w-80 shrink-0 flex-col border-r border-warm-200 bg-white">
+          <aside className="relative z-10 flex w-80 shrink-0 flex-col border-r border-warm-200 bg-white">
             <div className="flex border-b border-warm-200">
               <button
                 onClick={() => setActiveTab('documents')}
@@ -266,7 +266,7 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
                   classId={classId}
                   flashcards={flashcards}
                   onFlashcardsChange={setFlashcards}
-                  hasDocuments={initialDocuments.length > 0}
+                  hasDocuments={documents.some((doc) => doc.embedding_status === 'completed')}
                 />
               )}
             </div>

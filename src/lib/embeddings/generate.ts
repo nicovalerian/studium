@@ -29,7 +29,7 @@ export async function generateDocumentEmbeddings(
   _userSupabase: unknown,
   documentId: string,
   content: string
-): Promise<{ embedding_status: 'completed' | 'failed'; error_message?: string }> {
+): Promise<{ embedding_status: 'completed' | 'failed' | 'processing'; error_message?: string }> {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     console.error('Missing Supabase environment variables');
     return {
@@ -57,8 +57,8 @@ export async function generateDocumentEmbeddings(
     .or(
       `embedding_status.eq.pending,embedding_status.eq.failed,and(embedding_status.eq.processing,processing_started_at.lt.${stuckThreshold})`
     )
-    .select()
-    .single();
+    .select('id')
+    .maybeSingle();
 
   if (claimError) {
     console.error('Embedding claim error:', claimError);
@@ -74,9 +74,9 @@ export async function generateDocumentEmbeddings(
   }
 
   if (!claimed) {
-    console.error('Document claim returned no data - document may already be processing');
+    console.log('Document not claimed - already being processed or not eligible');
     return {
-      embedding_status: 'failed',
+      embedding_status: 'processing',
       error_message: 'Document is already being processed by another request',
     };
   }

@@ -56,22 +56,29 @@ export function GenerateButton({ classId, onGenerateComplete, disabled }: Genera
   };
 
   return (
-    <Button
-      onClick={handleGenerate}
-      disabled={disabled || isGenerating}
-      className="w-full bg-primary font-semibold text-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:bg-[hsl(var(--terracotta-dark))] hover:shadow-md"
-    >
-      {isGenerating ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Generating...
-        </>
-      ) : (
-        <>
-          <Sparkles className="mr-2 h-4 w-4" />
-          Generate Flashcards
-        </>
+    <div className="space-y-2">
+      <Button
+        onClick={handleGenerate}
+        disabled={disabled || isGenerating}
+        className="w-full bg-primary font-semibold text-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:bg-[hsl(var(--terracotta-dark))] hover:shadow-md"
+      >
+        {isGenerating ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Generating...
+          </>
+        ) : (
+          <>
+            <Sparkles className="mr-2 h-4 w-4" />
+            Generate Flashcards
+          </>
+        )}
+      </Button>
+      {disabled && !isGenerating && (
+        <p className="text-center text-xs text-[hsl(var(--warm-500))]">
+          Upload and process documents first to generate flashcards
+        </p>
       )}
-    </Button>
+    </div>
   );
 }
