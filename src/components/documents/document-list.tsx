@@ -245,17 +245,19 @@ export function DocumentList({ documents, onDocumentsDeleted }: DocumentListProp
                 className="border-[hsl(var(--warm-300))] data-[state=checked]:border-primary data-[state=checked]:bg-primary"
               />
               <FileText className="h-5 w-5 text-[hsl(var(--warm-400))]" />
-              <div>
+              <div className="flex-1">
                 <p className="font-medium text-[hsl(var(--warm-800))]">
                   {doc.display_name || doc.filename}
                 </p>
-                <p className="text-xs text-[hsl(var(--warm-500))]">
-                  {new Date(doc.created_at).toLocaleDateString()}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-[hsl(var(--warm-500))]">
+                    {new Date(doc.created_at).toLocaleDateString()}
+                  </p>
+                  <StatusBadge status={doc.embedding_status} />
+                </div>
               </div>
             </div>
-            <div className="relative z-10 flex items-center gap-2">
-              <StatusBadge status={doc.embedding_status} />
+            <div className="relative z-10">
               <AlertDialog
                 open={singleDeleteId === doc.id}
                 onOpenChange={(open) => !open && setSingleDeleteId(null)}
