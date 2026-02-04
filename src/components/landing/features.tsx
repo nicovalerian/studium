@@ -1,71 +1,91 @@
-import { Upload, MessageSquare, Zap, BookOpen } from 'lucide-react';
+import { Upload, MessageCircle, Layers, BookOpen } from 'lucide-react';
 
 const features = [
   {
-    name: 'Upload Documents',
+    title: 'Drop your files',
     description:
-      'Support for PDF and DOCX files. Simply upload your course materials and let our AI process them instantly.',
+      'PDF or Word documents—just drag and drop. Your materials are processed instantly and kept private.',
     icon: Upload,
-    color: 'bg-[hsl(199,89%,48%)]',
-    lightColor: 'bg-[hsl(199,89%,95%)]',
+    accent: 'terracotta',
   },
   {
-    name: 'AI Chat',
+    title: 'Have a conversation',
     description:
-      'Ask questions about your materials and get smart, context-aware answers based specifically on your notes.',
-    icon: MessageSquare,
-    color: 'bg-[hsl(142,76%,36%)]',
-    lightColor: 'bg-[hsl(142,76%,95%)]',
+      'Ask questions about your notes like you would a study partner. Get answers grounded in your actual materials.',
+    icon: MessageCircle,
+    accent: 'sage',
   },
   {
-    name: 'Smart Flashcards',
+    title: 'Generate flashcards',
     description:
-      'Automatically generate study cards from your content. Save hours of manual typing and focus on learning.',
-    icon: Zap,
-    color: 'bg-[hsl(25,95%,53%)]',
-    lightColor: 'bg-[hsl(25,95%,95%)]',
+      'Turn dense notes into bite-sized cards automatically. Edit them, organize them, make them yours.',
+    icon: Layers,
+    accent: 'sand',
   },
   {
-    name: 'Study Mode',
+    title: 'Study with intent',
     description:
-      'Review your flashcards with interactive flip animations and track your progress as you master each topic.',
+      'Review your cards with a clean, distraction-free interface. Focus on what matters—actually learning.',
     icon: BookOpen,
-    color: 'bg-[hsl(250,60%,60%)]',
-    lightColor: 'bg-[hsl(250,60%,95%)]',
+    accent: 'terracotta',
   },
 ];
 
+const accentStyles = {
+  terracotta: {
+    bg: 'bg-terracotta-light',
+    icon: 'text-terracotta',
+    border: 'border-terracotta/20',
+  },
+  sage: {
+    bg: 'bg-sage-light',
+    icon: 'text-sage',
+    border: 'border-sage/20',
+  },
+  sand: {
+    bg: 'bg-sand-light',
+    icon: 'text-sand',
+    border: 'border-sand/20',
+  },
+};
+
 export function Features() {
   return (
-    <section id="features" className="bg-white py-24 sm:py-32">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="how-it-works" className="bg-white py-24 sm:py-32">
+      <div className="container mx-auto px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-4xl font-extrabold tracking-tight text-[hsl(220,20%,20%)] sm:text-5xl">
-            Everything you need to excel
+          <h2 className="font-serif text-4xl font-medium tracking-tight text-warm-800 sm:text-5xl">
+            Simple by design
           </h2>
-          <p className="mt-6 text-xl leading-relaxed text-[hsl(220,10%,45%)]">
-            Studium combines powerful AI with proven study techniques to help you learn faster and
-            retain more.
+          <p className="mt-6 text-lg leading-relaxed text-warm-500">
+            No complicated setup. No learning curve. Just upload, chat, and study.
           </p>
         </div>
 
-        <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-          <div className="grid max-w-xl grid-cols-1 gap-8 lg:max-w-none lg:grid-cols-2">
-            {features.map((feature) => (
-              <div key={feature.name} className="feature-card flex gap-6">
+        <div className="mx-auto mt-20 max-w-5xl">
+          <div className="grid gap-8 md:grid-cols-2">
+            {features.map((feature, index) => {
+              const styles = accentStyles[feature.accent as keyof typeof accentStyles];
+              return (
                 <div
-                  className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl ${feature.color} text-white shadow-lg`}
+                  key={feature.title}
+                  className="card-warm-hover group relative"
+                  style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <feature.icon className="h-7 w-7" aria-hidden="true" />
+                  <div className="flex gap-5">
+                    <div
+                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${styles.bg} transition-transform duration-200 group-hover:scale-110`}
+                    >
+                      <feature.icon className={`h-6 w-6 ${styles.icon}`} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-warm-800">{feature.title}</h3>
+                      <p className="mt-2 leading-relaxed text-warm-500">{feature.description}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="mb-2 text-xl font-bold text-[hsl(220,20%,20%)]">{feature.name}</h3>
-                  <p className="text-base leading-relaxed text-[hsl(220,10%,45%)]">
-                    {feature.description}
-                  </p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

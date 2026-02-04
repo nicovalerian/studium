@@ -100,8 +100,8 @@ export function FlashcardReview({ flashcards, classId }: FlashcardReviewProps) {
   if (flashcards.length === 0) {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center text-center">
-        <h2 className="text-2xl font-bold text-slate-800">No flashcards yet</h2>
-        <p className="mt-2 text-muted-foreground">
+        <h2 className="text-2xl font-bold text-[hsl(var(--warm-800))]">No flashcards yet</h2>
+        <p className="mt-2 text-[hsl(var(--warm-500))]">
           Generate some flashcards in the class dashboard to start studying.
         </p>
         <Button asChild className="mt-6" variant="outline">
@@ -134,14 +134,14 @@ export function FlashcardReview({ flashcards, classId }: FlashcardReviewProps) {
             asChild
             variant="ghost"
             size="sm"
-            className="-ml-2 text-muted-foreground hover:text-foreground"
+            className="-ml-2 text-[hsl(var(--warm-500))] hover:bg-[hsl(var(--warm-100))] hover:text-[hsl(var(--warm-700))]"
           >
             <Link href={`/class/${classId}`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Class
             </Link>
           </Button>
-          <div className="text-sm font-medium text-muted-foreground">Study Mode</div>
+          <div className="text-sm font-medium text-[hsl(var(--warm-500))]">Study Mode</div>
         </div>
 
         <div className="flex flex-col items-center gap-8">

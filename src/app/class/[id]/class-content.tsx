@@ -7,13 +7,14 @@ import { DocumentList } from '@/components/documents/document-list';
 import { FlashcardSection } from '@/components/flashcards/flashcard-section';
 import { Flashcard } from '@/components/flashcards/flashcard-item';
 import { Toaster } from '@/components/ui/toaster';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { createClient } from '@/lib/supabase/client';
 import { ChatContainer } from '@/components/chat/chat-container';
 import { ChatInput } from '@/components/chat/chat-input';
 import { RateLimitTimer } from '@/components/chat/rate-limit-timer';
 import { MessageProps } from '@/components/chat/message';
+import { FileText, Layers, MessageCircle, LogOut } from 'lucide-react';
+import Link from 'next/link';
 
 interface Document {
   id: string;
@@ -43,6 +44,7 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [isLoading, setIsLoading] = useState(false);
   const [rateLimit, setRateLimit] = useState<RateLimitState | null>(null);
+  const [activeTab, setActiveTab] = useState<'documents' | 'flashcards'>('documents');
 
   useEffect(() => {
     setDocuments(initialDocuments);
@@ -197,47 +199,89 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
     });
   };
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+
   return (
     <>
-      <main className="container mx-auto grid h-[calc(100vh-4rem)] gap-6 p-4 lg:grid-cols-3">
-        <div className="h-full space-y-6 overflow-y-auto pb-4 lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Upload Documents</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FileUpload classId={classId} onUploadComplete={handleUploadComplete} />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Documents</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <DocumentList documents={documents} />
-            </CardContent>
-          </Card>
-          <div className="h-[500px]">
-            <FlashcardSection
-              classId={classId}
-              flashcards={flashcards}
-              onFlashcardsChange={setFlashcards}
-              hasDocuments={initialDocuments.length > 0}
-            />
-          </div>
-        </div>
-        <div className="h-full lg:col-span-2">
-          <Card className="flex h-full flex-col overflow-hidden border-2 shadow-md">
-            <CardHeader className="border-b bg-muted/30 px-6 py-4">
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-xl">💬</span>
-                Study Chat
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-1 flex-col overflow-hidden p-0">
+      <div className="flex h-screen flex-col bg-warm-50">
+        <header className="flex h-14 shrink-0 items-center justify-between border-b border-warm-200 bg-white px-4">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-warm-800">
+              <span className="font-serif text-xs font-medium text-warm-50">S</span>
+            </div>
+            <span className="font-serif text-base font-medium text-warm-800">Studium</span>
+          </Link>
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-warm-500 transition-colors hover:bg-warm-100 hover:text-warm-700"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign out
+          </button>
+        </header>
+
+        <div className="flex flex-1 overflow-hidden">
+          <aside className="flex w-80 shrink-0 flex-col border-r border-warm-200 bg-white">
+            <div className="flex border-b border-warm-200">
+              <button
+                onClick={() => setActiveTab('documents')}
+                className={`flex flex-1 items-center justify-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
+                  activeTab === 'documents'
+                    ? 'border-terracotta text-terracotta'
+                    : 'border-transparent text-warm-500 hover:text-warm-700'
+                }`}
+              >
+                <FileText className="h-4 w-4" />
+                Documents
+              </button>
+              <button
+                onClick={() => setActiveTab('flashcards')}
+                className={`flex flex-1 items-center justify-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
+                  activeTab === 'flashcards'
+                    ? 'border-terracotta text-terracotta'
+                    : 'border-transparent text-warm-500 hover:text-warm-700'
+                }`}
+              >
+                <Layers className="h-4 w-4" />
+                Flashcards
+                {flashcards.length > 0 && (
+                  <span className="rounded-full bg-warm-200 px-1.5 py-0.5 text-xs text-warm-600">
+                    {flashcards.length}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4">
+              {activeTab === 'documents' ? (
+                <div className="space-y-4">
+                  <FileUpload classId={classId} onUploadComplete={handleUploadComplete} />
+                  <DocumentList documents={documents} onDocumentsDeleted={refreshDocuments} />
+                </div>
+              ) : (
+                <FlashcardSection
+                  classId={classId}
+                  flashcards={flashcards}
+                  onFlashcardsChange={setFlashcards}
+                  hasDocuments={initialDocuments.length > 0}
+                />
+              )}
+            </div>
+          </aside>
+
+          <main className="flex flex-1 flex-col overflow-hidden">
+            <div className="flex h-12 shrink-0 items-center gap-2 border-b border-warm-200 bg-white px-4">
+              <MessageCircle className="h-4 w-4 text-terracotta" />
+              <span className="text-sm font-medium text-warm-700">Chat with your notes</span>
+            </div>
+
+            <div className="flex flex-1 flex-col overflow-hidden bg-gradient-to-b from-warm-50 to-white">
               <ChatContainer messages={messages} isLoading={isLoading} />
 
-              <div className="border-t bg-muted/10 p-4">
+              <div className="shrink-0 border-t border-warm-200 bg-white p-4">
                 {rateLimit ? (
                   <RateLimitTimer
                     retryAfter={rateLimit.retryAfter}
@@ -250,15 +294,15 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
                     placeholder={
                       documents.length === 0
                         ? 'Upload documents to start chatting...'
-                        : 'Ask a question about your documents...'
+                        : 'Ask something about your notes...'
                     }
                   />
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </main>
         </div>
-      </main>
+      </div>
       <Toaster />
     </>
   );

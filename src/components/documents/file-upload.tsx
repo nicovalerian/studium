@@ -113,35 +113,37 @@ export function FileUpload({ classId, onUploadComplete }: FileUploadProps) {
     <div className="space-y-4">
       <div
         {...getRootProps()}
-        className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+        className={`cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-all duration-200 ${
           isDragActive
-            ? 'border-primary bg-primary/5'
-            : 'border-muted-foreground/25 hover:border-primary/50'
+            ? 'border-primary bg-[hsl(var(--terracotta-light))]'
+            : 'border-[hsl(var(--warm-300))] hover:border-primary/50 hover:bg-[hsl(var(--warm-100))]'
         } ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
       >
         <input {...getInputProps()} />
         <div className="flex flex-col items-center gap-2">
           {isUploading ? (
-            <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+            <Loader2 className="h-10 w-10 animate-spin text-[hsl(var(--warm-400))]" />
           ) : isDragActive ? (
             <FileText className="h-10 w-10 text-primary" />
           ) : (
-            <Upload className="h-10 w-10 text-muted-foreground" />
+            <Upload className="h-10 w-10 text-[hsl(var(--warm-400))]" />
           )}
           <div>
             {isDragActive ? (
-              <p className="text-primary">Drop the file here</p>
+              <p className="font-medium text-primary">Drop the file here</p>
             ) : (
               <>
-                <p className="font-medium">Drag & drop a file here</p>
-                <p className="text-sm text-muted-foreground">or click to browse</p>
+                <p className="font-medium text-[hsl(var(--warm-700))]">Drag & drop a file here</p>
+                <p className="text-sm text-[hsl(var(--warm-500))]">or click to browse</p>
               </>
             )}
           </div>
-          <p className="text-xs text-muted-foreground">PDF or DOCX, max 10MB</p>
+          <p className="text-xs text-[hsl(var(--warm-400))]">PDF or DOCX, max 10MB</p>
         </div>
       </div>
-      {isUploading && <Progress value={progress} />}
+      {isUploading && (
+        <Progress value={progress} className="h-2 bg-[hsl(var(--warm-200))] [&>*]:bg-primary" />
+      )}
     </div>
   );
 }

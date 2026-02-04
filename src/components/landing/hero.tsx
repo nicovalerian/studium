@@ -1,76 +1,92 @@
 import Link from 'next/link';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-white via-[hsl(142,76%,97%)] to-white py-20 sm:py-32 lg:pb-32 xl:pb-36">
-      {/* Decorative elements */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="animate-float absolute left-10 top-20 h-20 w-20 rounded-full bg-[hsl(142,76%,36%,0.1)]" />
-        <div className="animate-float-delayed absolute right-20 top-40 h-16 w-16 rounded-full bg-[hsl(25,95%,53%,0.1)]" />
-        <div className="animate-float absolute bottom-40 left-1/4 h-12 w-12 rounded-full bg-[hsl(250,60%,60%,0.1)]" />
+    <section className="relative min-h-[90vh] overflow-hidden bg-gradient-to-b from-warm-50 via-warm-100/50 to-warm-50">
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute left-1/4 top-20 h-64 w-64 rounded-full bg-terracotta/10 blur-3xl" />
+        <div className="absolute bottom-20 right-1/4 h-80 w-80 rounded-full bg-sage/10 blur-3xl" />
+        <div className="absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sand-light blur-3xl" />
       </div>
 
-      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container relative mx-auto flex min-h-[90vh] flex-col items-center justify-center px-6 py-20">
         <div className="mx-auto max-w-3xl text-center">
-          {/* Badge */}
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full bg-[hsl(142,76%,95%)] px-4 py-2 text-sm font-bold text-[hsl(142,76%,28%)]">
-            <Sparkles className="h-4 w-4" />
-            AI-Powered Learning
+          <div className="animate-fade-in mb-8">
+            <span className="badge-warm">A new way to study</span>
           </div>
 
-          <h1 className="text-5xl font-extrabold tracking-tight text-[hsl(220,20%,20%)] sm:text-6xl lg:text-7xl">
-            Study Smarter with{' '}
-            <span className="relative inline-block">
-              <span className="relative z-10 text-[hsl(142,76%,36%)]">AI</span>
-              <svg
-                className="absolute -bottom-2 left-0 w-full"
-                height="12"
-                viewBox="0 0 100 12"
-                preserveAspectRatio="none"
-              >
-                <path
-                  d="M0,8 Q50,0 100,8"
-                  stroke="hsl(142,76%,36%)"
-                  strokeWidth="4"
-                  fill="none"
-                  opacity="0.3"
-                />
-              </svg>
-            </span>
+          <h1 className="animate-fade-in stagger-1 font-serif text-5xl font-medium leading-tight tracking-tight text-warm-800 opacity-0 sm:text-6xl lg:text-7xl">
+            Your notes deserve
+            <br />
+            <span className="text-gradient-warm">a conversation</span>
           </h1>
 
-          <p className="mx-auto mt-8 max-w-2xl text-xl leading-relaxed text-[hsl(220,10%,45%)]">
-            Upload your notes, chat with AI about your materials, and generate flashcards
-            automatically. Your personal AI-powered study companion.
+          <p className="animate-fade-in stagger-2 mx-auto mt-8 max-w-xl text-lg leading-relaxed text-warm-500 opacity-0">
+            Upload your study materials and have a thoughtful dialogue about what you&apos;re
+            learning. Create flashcards that actually stick.
           </p>
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link
-              href="/login"
-              className="btn-primary animate-pulse-soft flex items-center gap-2 text-lg"
-            >
-              Get Started
-              <ArrowRight className="h-5 w-5" />
+          <div className="animate-fade-in stagger-3 mt-12 flex flex-col items-center justify-center gap-4 opacity-0 sm:flex-row">
+            <Link href="/login" className="btn-warm group flex items-center gap-2 text-lg">
+              Start studying
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
-            <Link href="#features" className="btn-secondary text-lg">
-              Learn More
+            <Link href="#how-it-works" className="btn-soft text-lg">
+              See how it works
             </Link>
           </div>
+        </div>
 
-          {/* Stats */}
-          <div className="mx-auto mt-16 grid max-w-lg grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-[hsl(142,76%,36%)]">10K+</div>
-              <div className="mt-1 text-sm text-[hsl(220,10%,45%)]">Active Learners</div>
+        <div className="animate-slide-up stagger-4 mt-20 w-full max-w-4xl opacity-0">
+          <div className="card-paper overflow-hidden p-0">
+            <div className="border-b border-warm-200 bg-warm-100/50 px-4 py-3">
+              <div className="flex gap-2">
+                <div className="h-3 w-3 rounded-full bg-warm-300" />
+                <div className="h-3 w-3 rounded-full bg-warm-300" />
+                <div className="h-3 w-3 rounded-full bg-warm-300" />
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-[hsl(25,95%,53%)]">50K+</div>
-              <div className="mt-1 text-sm text-[hsl(220,10%,45%)]">Flashcards Created</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-[hsl(250,60%,60%)]">98%</div>
-              <div className="mt-1 text-sm text-[hsl(220,10%,45%)]">Satisfaction</div>
+            <div className="grid gap-4 p-6 md:grid-cols-3">
+              <div className="space-y-3 rounded-lg bg-warm-100/50 p-4">
+                <div className="text-xs font-medium uppercase tracking-wide text-warm-400">
+                  Documents
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 rounded-md bg-white p-2 shadow-sm">
+                    <div className="h-8 w-8 rounded bg-terracotta-light" />
+                    <div className="flex-1">
+                      <div className="h-2 w-20 rounded bg-warm-300" />
+                      <div className="mt-1 h-2 w-12 rounded bg-warm-200" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 rounded-md bg-white p-2 shadow-sm">
+                    <div className="h-8 w-8 rounded bg-sage-light" />
+                    <div className="flex-1">
+                      <div className="h-2 w-24 rounded bg-warm-300" />
+                      <div className="mt-1 h-2 w-16 rounded bg-warm-200" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3 md:col-span-2">
+                <div className="text-xs font-medium uppercase tracking-wide text-warm-400">
+                  Chat
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-end">
+                    <div className="rounded-2xl rounded-br-md bg-terracotta px-4 py-2 text-sm text-white">
+                      Explain the key concepts
+                    </div>
+                  </div>
+                  <div className="flex">
+                    <div className="max-w-[80%] rounded-2xl rounded-bl-md bg-white px-4 py-2 text-sm text-warm-700 shadow-sm">
+                      Based on your notes, here are the main ideas...
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

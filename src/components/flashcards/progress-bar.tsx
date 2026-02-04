@@ -12,7 +12,7 @@ export function ProgressBar({ current, total }: ProgressBarProps) {
 
   return (
     <div className="w-full max-w-md space-y-2">
-      <div className="flex justify-between text-sm font-medium text-muted-foreground">
+      <div className="flex justify-between text-sm font-medium text-[hsl(var(--warm-500))]">
         <span>Progress</span>
         <span>
           {current} of {total}
@@ -20,7 +20,7 @@ export function ProgressBar({ current, total }: ProgressBarProps) {
       </div>
       <Progress
         value={progress}
-        className="h-2 bg-indigo-100 [&>*]:bg-gradient-to-r [&>*]:from-indigo-500 [&>*]:to-purple-500"
+        className="h-2 bg-[hsl(var(--warm-200))] [&>*]:bg-gradient-to-r [&>*]:from-primary [&>*]:to-[hsl(var(--sage))]"
       />
     </div>
   );

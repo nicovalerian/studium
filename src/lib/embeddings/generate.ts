@@ -15,6 +15,7 @@ async function withRetry<T>(
       return await fn();
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
+      console.error(`Attempt ${attempt}/${maxAttempts} failed:`, lastError.message);
       if (attempt < maxAttempts) {
         const delay = baseDelayMs * Math.pow(2, attempt - 1);
         await new Promise((resolve) => setTimeout(resolve, delay));
@@ -29,9 +30,17 @@ export async function generateDocumentEmbeddings(
   documentId: string,
   content: string
 ): Promise<{ embedding_status: 'completed' | 'failed'; error_message?: string }> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.error('Missing Supabase environment variables');
+    return {
+      embedding_status: 'failed',
+      error_message: 'Server configuration error: missing database credentials',
+    };
+  }
+
   const serviceSupabase = createServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
   );
 
   const processingTimestamp = new Date().toISOString();
@@ -51,17 +60,32 @@ export async function generateDocumentEmbeddings(
     .select()
     .single();
 
-  if (claimError || !claimed) {
-    if (claimError) {
-      console.error('Embedding claim error:', claimError);
-    }
+  if (claimError) {
+    console.error('Embedding claim error:', claimError);
+    await markDocumentFailed(
+      serviceSupabase,
+      documentId,
+      `Failed to claim document for processing: ${claimError.message}`
+    );
     return {
       embedding_status: 'failed',
-      error_message: 'Document is already being processed',
+      error_message: `Database error: ${claimError.message}`,
+    };
+  }
+
+  if (!claimed) {
+    console.error('Document claim returned no data - document may already be processing');
+    return {
+      embedding_status: 'failed',
+      error_message: 'Document is already being processed by another request',
     };
   }
 
   try {
+    if (!content || content.trim().length === 0) {
+      throw new Error('Document content is empty');
+    }
+
     await serviceSupabase
       .from('document_chunks')
       .delete()
@@ -69,8 +93,15 @@ export async function generateDocumentEmbeddings(
       .throwOnError();
 
     const chunks = chunkText(content);
+    console.log(`Processing document ${documentId}: ${chunks.length} chunks`);
+
+    if (chunks.length === 0) {
+      throw new Error('No chunks generated from document content');
+    }
+
     for (let index = 0; index < chunks.length; index++) {
       const chunk = chunks[index];
+      console.log(`Generating embedding for chunk ${index + 1}/${chunks.length}`);
       const embedding = await withRetry(() => generateEmbedding(chunk), 3, 1000);
       await serviceSupabase
         .from('document_chunks')
@@ -93,12 +124,27 @@ export async function generateDocumentEmbeddings(
       .eq('id', documentId)
       .throwOnError();
 
+    console.log(`Document ${documentId} embedding completed successfully`);
     return { embedding_status: 'completed' };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error during embedding generation';
+    console.error(`Document ${documentId} embedding failed:`, errorMessage);
 
-    await serviceSupabase
+    await markDocumentFailed(serviceSupabase, documentId, errorMessage);
+
+    return { embedding_status: 'failed', error_message: errorMessage };
+  }
+}
+
+async function markDocumentFailed(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  documentId: string,
+  errorMessage: string
+): Promise<void> {
+  try {
+    await supabase
       .from('documents')
       .update({
         embedding_status: 'failed',
@@ -106,7 +152,7 @@ export async function generateDocumentEmbeddings(
         updated_at: new Date().toISOString(),
       })
       .eq('id', documentId);
-
-    return { embedding_status: 'failed', error_message: errorMessage };
+  } catch (updateError) {
+    console.error('Failed to update document status to failed:', updateError);
   }
 }

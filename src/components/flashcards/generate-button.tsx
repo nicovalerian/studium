@@ -59,7 +59,7 @@ export function GenerateButton({ classId, onGenerateComplete, disabled }: Genera
     <Button
       onClick={handleGenerate}
       disabled={disabled || isGenerating}
-      className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 font-bold text-white shadow-md transition-all hover:scale-[1.02] hover:from-indigo-600 hover:to-purple-700 hover:shadow-lg"
+      className="w-full bg-primary font-semibold text-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:bg-[hsl(var(--terracotta-dark))] hover:shadow-md"
     >
       {isGenerating ? (
         <>

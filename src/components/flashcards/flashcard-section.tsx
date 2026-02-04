@@ -36,17 +36,17 @@ export function FlashcardSection({
     <Card className="flex h-full flex-col overflow-hidden">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Layers className="h-5 w-5 text-indigo-500" />
+          <Layers className="h-5 w-5 text-[hsl(var(--sage))]" />
           Flashcards
           <div className="ml-auto flex items-center gap-2">
-            <span className="rounded-full bg-muted px-2 py-1 text-xs font-normal text-muted-foreground">
+            <span className="rounded-full bg-[hsl(var(--warm-200))] px-2 py-1 text-xs font-normal text-[hsl(var(--warm-600))]">
               {flashcards.length}
             </span>
             {flashcards.length > 0 && (
               <Button
                 asChild
                 size="sm"
-                className="h-7 rounded-full bg-indigo-600 hover:bg-indigo-700"
+                className="h-7 rounded-full bg-[hsl(var(--sage))] hover:bg-[hsl(var(--sage-dark))]"
               >
                 <Link href={`/class/${classId}/flashcards`}>
                   <Play className="mr-1 h-3 w-3" /> Study
@@ -65,9 +65,9 @@ export function FlashcardSection({
 
         <div className="-mr-2 flex-1 overflow-y-auto pr-2">
           {flashcards.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center rounded-xl border-2 border-dashed bg-muted/20 p-4 text-center text-muted-foreground">
-              <Layers className="mb-2 h-8 w-8 opacity-20" />
-              <p className="text-sm font-medium">No flashcards yet</p>
+            <div className="flex h-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-[hsl(var(--warm-200))] bg-[hsl(var(--warm-100))] p-4 text-center text-[hsl(var(--warm-500))]">
+              <Layers className="mb-2 h-8 w-8 text-[hsl(var(--warm-300))]" />
+              <p className="text-sm font-medium text-[hsl(var(--warm-600))]">No flashcards yet</p>
               <p className="mt-1 max-w-[180px] text-xs">
                 {hasDocuments
                   ? 'Click generate to create flashcards from your documents.'

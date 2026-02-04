@@ -1,18 +1,17 @@
 export function Footer() {
   return (
-    <footer className="bg-[hsl(220,20%,15%)] py-12">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <footer className="border-t border-warm-200 bg-warm-50 py-12">
+      <div className="container mx-auto px-6">
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[hsl(142,76%,36%)]">
-              <span className="text-sm font-bold text-white">S</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-warm-800">
+              <span className="font-serif text-sm font-medium text-warm-50">S</span>
             </div>
-            <span className="text-lg font-bold text-white">Studium</span>
+            <span className="font-serif text-lg font-medium text-warm-800">Studium</span>
           </div>
-          <p className="text-sm text-[hsl(220,10%,60%)]">
-            &copy; {new Date().getFullYear()} Studium. All rights reserved.
+          <p className="text-sm text-warm-500">
+            &copy; {new Date().getFullYear()} Studium. Made for learners.
           </p>
-          <p className="text-sm text-[hsl(220,10%,60%)]">Built with Next.js, Supabase, and AI</p>
         </div>
       </div>
     </footer>

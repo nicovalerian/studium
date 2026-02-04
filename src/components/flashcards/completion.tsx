@@ -13,27 +13,33 @@ interface CompletionScreenProps {
 export function CompletionScreen({ totalReviewed, onRestart, classId }: CompletionScreenProps) {
   return (
     <div className="flex min-h-[500px] w-full flex-col items-center justify-center p-8 text-center duration-500 animate-in fade-in zoom-in">
-      <div className="mb-6 rounded-full bg-green-100 p-6">
-        <CheckCircle2 className="h-16 w-16 text-green-600" />
+      <div className="mb-6 rounded-full bg-[hsl(var(--sage-light))] p-6">
+        <CheckCircle2 className="h-16 w-16 text-[hsl(var(--sage))]" />
       </div>
 
-      <h2 className="mb-2 text-3xl font-bold text-slate-900">Review Complete!</h2>
-      <p className="mb-8 text-lg text-muted-foreground">
+      <h2 className="mb-2 text-3xl font-bold text-[hsl(var(--warm-800))]">Review Complete!</h2>
+      <p className="mb-8 text-lg text-[hsl(var(--warm-500))]">
         You&apos;ve reviewed all{' '}
-        <span className="font-semibold text-foreground">{totalReviewed}</span> flashcards.
+        <span className="font-semibold text-[hsl(var(--warm-700))]">{totalReviewed}</span>{' '}
+        flashcards.
       </p>
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Button
           onClick={onRestart}
           size="lg"
-          className="min-w-[160px] rounded-full bg-indigo-600 hover:bg-indigo-700"
+          className="min-w-[160px] rounded-full bg-primary hover:bg-[hsl(var(--terracotta-dark))]"
         >
           <RotateCcw className="mr-2 h-4 w-4" />
           Review Again
         </Button>
 
-        <Button asChild variant="outline" size="lg" className="min-w-[160px] rounded-full">
+        <Button
+          asChild
+          variant="outline"
+          size="lg"
+          className="min-w-[160px] rounded-full border-[hsl(var(--warm-300))]"
+        >
           <Link href={`/class/${classId}`}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Class

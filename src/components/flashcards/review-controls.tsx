@@ -32,7 +32,7 @@ export function ReviewControls({
         size="icon"
         onClick={onPrevious}
         disabled={!hasPrevious}
-        className="h-12 w-12 rounded-full border-2"
+        className="h-12 w-12 rounded-full border-2 border-[hsl(var(--warm-300))]"
         title="Previous Card (Left Arrow)"
       >
         <ArrowLeft className="h-5 w-5" />
@@ -41,7 +41,7 @@ export function ReviewControls({
       <Button
         variant="outline"
         onClick={onFlip}
-        className="h-12 min-w-[140px] rounded-full border-2 border-indigo-100 text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800"
+        className="h-12 min-w-[140px] rounded-full border-2 border-[hsl(var(--terracotta-light))] text-primary hover:bg-[hsl(var(--terracotta-light))] hover:text-[hsl(var(--terracotta-dark))]"
         title="Flip Card (Space)"
       >
         <RotateCw className="mr-2 h-4 w-4" />
@@ -51,10 +51,10 @@ export function ReviewControls({
       <Button
         onClick={onNext}
         className={cn(
-          'h-12 min-w-[120px] rounded-full px-6 font-semibold shadow-lg transition-all hover:scale-105',
+          'h-12 min-w-[120px] rounded-full px-6 font-semibold shadow-md transition-all duration-200 hover:scale-105',
           isLast
-            ? 'bg-green-600 hover:bg-green-700'
-            : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700'
+            ? 'bg-[hsl(var(--sage))] hover:bg-[hsl(var(--sage-dark))]'
+            : 'bg-primary hover:bg-[hsl(var(--terracotta-dark))]'
         )}
         title={isLast ? 'Finish Review' : 'Next Card (Right Arrow)'}
       >
@@ -62,7 +62,7 @@ export function ReviewControls({
         {!isLast && <ArrowRight className="ml-2 h-4 w-4" />}
       </Button>
 
-      <div className="ml-4 border-l pl-4">
+      <div className="ml-4 border-l border-[hsl(var(--warm-200))] pl-4">
         <Button
           variant="ghost"
           size="icon"
@@ -70,8 +70,8 @@ export function ReviewControls({
           className={cn(
             'h-10 w-10 rounded-full transition-colors',
             isShuffled
-              ? 'bg-purple-100 text-purple-700'
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'bg-[hsl(var(--sage-light))] text-[hsl(var(--sage-dark))]'
+              : 'text-[hsl(var(--warm-400))] hover:bg-[hsl(var(--warm-100))] hover:text-[hsl(var(--warm-700))]'
           )}
           title="Shuffle Cards"
         >

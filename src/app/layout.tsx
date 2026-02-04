@@ -1,31 +1,31 @@
 import type { Metadata } from 'next';
-import localFont from 'next/font/local';
+import { Source_Serif_4, Inter } from 'next/font/google';
 import './globals.css';
 
-const geistSans = localFont({
-  src: './fonts/GeistVF.woff',
-  variable: '--font-geist-sans',
-  weight: '100 900',
+const sourceSerif = Source_Serif_4({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  display: 'swap',
 });
-const geistMono = localFont({
-  src: './fonts/GeistMonoVF.woff',
-  variable: '--font-geist-mono',
-  weight: '100 900',
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
   title: {
-    default: 'Studium - AI Study Buddy',
+    default: 'Studium - Your Study Companion',
     template: '%s | Studium',
   },
   description:
-    'Upload your study materials, chat with AI about your notes, and generate flashcards automatically. Your personal AI-powered study companion.',
+    'Upload your study materials, chat about your notes, and create flashcards. A thoughtful space for learning.',
   keywords: ['study', 'AI', 'flashcards', 'education', 'learning', 'notes', 'PDF'],
   authors: [{ name: 'Studium' }],
   openGraph: {
-    title: 'Studium - AI Study Buddy',
-    description:
-      'Upload your study materials, chat with AI about your notes, and generate flashcards automatically.',
+    title: 'Studium - Your Study Companion',
+    description: 'Upload your study materials, chat about your notes, and create flashcards.',
     url: 'https://studium.tech',
     siteName: 'Studium',
     locale: 'en_US',
@@ -33,8 +33,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Studium - AI Study Buddy',
-    description: 'Your personal AI-powered study companion.',
+    title: 'Studium - Your Study Companion',
+    description: 'A thoughtful space for learning.',
   },
   robots: {
     index: true,
@@ -49,7 +49,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+      <body className={`${inter.variable} ${sourceSerif.variable} font-sans antialiased`}>
+        {children}
+      </body>
     </html>
   );
 }

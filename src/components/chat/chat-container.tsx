@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { Message, MessageProps } from './message';
-import { Loader2 } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 
 interface ChatContainerProps {
   messages: MessageProps[];
@@ -18,20 +18,20 @@ export function ChatContainer({ messages, isLoading }: ChatContainerProps) {
 
   if (messages.length === 0 && !isLoading) {
     return (
-      <div className="flex h-full flex-col items-center justify-center p-8 text-center text-muted-foreground">
-        <div className="mb-4 rounded-full bg-muted p-4">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground/50" />
+      <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-terracotta-light">
+          <MessageCircle className="h-8 w-8 text-terracotta" />
         </div>
-        <h3 className="mb-2 text-lg font-semibold">No messages yet</h3>
-        <p className="max-w-sm text-sm">
-          Start the conversation by asking a question about your documents.
+        <h3 className="mb-2 font-serif text-xl font-medium text-warm-800">Start a conversation</h3>
+        <p className="max-w-sm text-warm-500">
+          Ask questions about your documents and get thoughtful answers based on your notes.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4">
+    <div className="flex flex-1 flex-col gap-1 overflow-y-auto px-4 py-6">
       {messages.map((msg, index) => (
         <Message
           key={index}
@@ -42,14 +42,14 @@ export function ChatContainer({ messages, isLoading }: ChatContainerProps) {
       ))}
 
       {isLoading && (
-        <div className="flex w-full gap-3 p-4">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border bg-muted shadow-sm">
-            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        <div className="flex w-full gap-3 py-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-warm-200">
+            <span className="font-serif text-xs font-medium text-warm-600">S</span>
           </div>
-          <div className="flex items-center gap-1 rounded-2xl rounded-tl-sm border bg-card px-4 py-3 shadow-sm">
-            <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40 [animation-delay:-0.3s]" />
-            <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40 [animation-delay:-0.15s]" />
-            <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40" />
+          <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-md bg-white px-4 py-3 shadow-sm">
+            <span className="h-2 w-2 animate-bounce rounded-full bg-warm-300 [animation-delay:-0.3s]" />
+            <span className="h-2 w-2 animate-bounce rounded-full bg-warm-300 [animation-delay:-0.15s]" />
+            <span className="h-2 w-2 animate-bounce rounded-full bg-warm-300" />
           </div>
         </div>
       )}
