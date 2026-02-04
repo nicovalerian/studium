@@ -6,11 +6,10 @@ import { Button } from '@/components/ui/button';
 export function LoginButton() {
   const handleLogin = async () => {
     const supabase = createClient();
-    const redirectBase = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${redirectBase}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
   };

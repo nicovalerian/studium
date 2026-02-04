@@ -40,14 +40,13 @@ export function UserNav({ user }: UserNavProps) {
         description: 'You have been signed out successfully.',
       });
 
-      const redirectBase = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
       try {
         localStorage.removeItem('supabase.auth.token');
         sessionStorage.removeItem('supabase.auth.token');
       } catch {
         // ignore storage cleanup errors
       }
-      window.location.href = `${redirectBase}/login`;
+      window.location.href = `${window.location.origin}/login`;
     } catch (error) {
       console.error('Unexpected error during sign out:', error);
       toast({

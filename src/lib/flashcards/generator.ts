@@ -30,11 +30,17 @@ export async function generateFlashcards(
 ): Promise<{ flashcards: GeneratedFlashcard[] } | { error: string }> {
   const prompt = buildFlashcardPrompt(content, false);
 
-  const response = await chat({
-    context: '',
-    history: [],
-    message: prompt,
-  });
+  let response;
+  try {
+    response = await chat({
+      context: '',
+      history: [],
+      message: prompt,
+    });
+  } catch (error) {
+    console.error('Flashcard AI error:', error);
+    return { error: 'AI service unavailable. Please check your API configuration.' };
+  }
 
   if (response.rateLimited) {
     return { error: `Rate limited. Please try again in ${response.retryAfter} seconds.` };
@@ -47,11 +53,17 @@ export async function generateFlashcards(
     return { flashcards: validated };
   } catch {
     const retryPrompt = buildFlashcardPrompt(content, true);
-    const retryResponse = await chat({
-      context: '',
-      history: [],
-      message: retryPrompt,
-    });
+    let retryResponse;
+    try {
+      retryResponse = await chat({
+        context: '',
+        history: [],
+        message: retryPrompt,
+      });
+    } catch (error) {
+      console.error('Flashcard AI retry error:', error);
+      return { error: 'AI service unavailable. Please check your API configuration.' };
+    }
 
     if (retryResponse.rateLimited) {
       return { error: `Rate limited. Please try again in ${retryResponse.retryAfter} seconds.` };

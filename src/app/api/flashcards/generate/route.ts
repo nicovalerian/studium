@@ -7,6 +7,7 @@ const MIN_CONTENT_LENGTH = 200;
 
 export async function POST(request: Request) {
   const supabase = await createClient();
+  const requestId = crypto.randomUUID();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -15,7 +16,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await request.json();
+  let body: { class_id?: string; document_id?: string };
+  try {
+    body = await request.json();
+  } catch (error) {
+    console.error('Flashcards invalid JSON:', { requestId, error });
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
   const { class_id, document_id } = body;
 
   if (!class_id) {
@@ -29,6 +36,14 @@ export async function POST(request: Request) {
     .single();
 
   if (classError || !classData) {
+    if (classError) {
+      console.error('Flashcards class fetch error:', {
+        requestId,
+        classId: class_id,
+        userId: user.id,
+        error: classError,
+      });
+    }
     return NextResponse.json({ error: 'Class not found' }, { status: 404 });
   }
 
@@ -43,6 +58,15 @@ export async function POST(request: Request) {
       .single();
 
     if (error || !data) {
+      if (error) {
+        console.error('Flashcards document fetch error:', {
+          requestId,
+          classId: class_id,
+          documentId: document_id,
+          userId: user.id,
+          error,
+        });
+      }
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
 
@@ -63,14 +87,30 @@ export async function POST(request: Request) {
       .order('created_at', { ascending: true });
 
     if (error) {
+      console.error('Flashcards documents fetch error:', {
+        requestId,
+        classId: class_id,
+        userId: user.id,
+        error,
+      });
       return NextResponse.json({ error: 'Failed to fetch documents' }, { status: 500 });
     }
 
     if (!data || data.length === 0) {
-      const { count } = await supabase
+      const { count, error: countError } = await supabase
         .from('documents')
         .select('*', { count: 'exact', head: true })
         .eq('class_id', class_id);
+
+      if (countError) {
+        console.error('Flashcards documents count error:', {
+          requestId,
+          classId: class_id,
+          userId: user.id,
+          error: countError,
+        });
+        return NextResponse.json({ error: 'Failed to count documents' }, { status: 500 });
+      }
 
       if (count === 0) {
         return NextResponse.json(
@@ -114,6 +154,12 @@ export async function POST(request: Request) {
   const result = await generateFlashcards(combinedContent);
 
   if ('error' in result) {
+    console.error('Flashcards generation error:', {
+      requestId,
+      classId: class_id,
+      userId: user.id,
+      error: result.error,
+    });
     return NextResponse.json({ error: result.error }, { status: 500 });
   }
 
@@ -130,6 +176,12 @@ export async function POST(request: Request) {
     .select('id, front, back');
 
   if (insertError) {
+    console.error('Flashcards insert error:', {
+      requestId,
+      classId: class_id,
+      userId: user.id,
+      error: insertError,
+    });
     return NextResponse.json({ error: 'Failed to save flashcards' }, { status: 500 });
   }
 

@@ -11,21 +11,26 @@ export async function searchSimilarChunks(
   threshold: number = 0.7,
   maxCount: number = 5
 ): Promise<DocumentChunk[]> {
-  const queryEmbedding = await generateEmbedding(query);
+  try {
+    const queryEmbedding = await generateEmbedding(query);
 
-  const { data, error } = await supabase.rpc('match_document_chunks', {
-    query_embedding: queryEmbedding,
-    match_threshold: threshold,
-    match_count: maxCount,
-    filter_class_id: classId,
-  });
+    const { data, error } = await supabase.rpc('match_document_chunks', {
+      query_embedding: queryEmbedding,
+      match_threshold: threshold,
+      match_count: maxCount,
+      filter_class_id: classId,
+    });
 
-  if (error) {
-    console.error('Error searching chunks:', error);
+    if (error) {
+      console.error('Error searching chunks:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Failed to generate query embedding:', error);
     return [];
   }
-
-  return data || [];
 }
 
 export function buildContext(chunks: DocumentChunk[]): string {
