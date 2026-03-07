@@ -1,6 +1,6 @@
 import { generateMockEmbedding } from '@/lib/ai/providers/mock';
 
-const HF_INFERENCE_API_URL = 'https://api-inference.huggingface.co/pipeline/feature-extraction';
+const HF_INFERENCE_BASE_URL = 'https://router.huggingface.co/hf-inference/models';
 const DEFAULT_MODEL = 'sentence-transformers/all-MiniLM-L6-v2';
 
 export async function generateEmbedding(text: string): Promise<number[]> {
@@ -14,7 +14,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
   }
 
   const model = process.env.HUGGINGFACE_EMBEDDING_MODEL || DEFAULT_MODEL;
-  const url = `${HF_INFERENCE_API_URL}/${model}`;
+  const url = `${HF_INFERENCE_BASE_URL}/${model}/pipeline/feature-extraction`;
 
   const response = await fetch(url, {
     method: 'POST',
@@ -24,9 +24,6 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     },
     body: JSON.stringify({
       inputs: text,
-      options: {
-        wait_for_model: true,
-      },
     }),
   });
 

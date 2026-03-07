@@ -13,8 +13,10 @@ import { ChatContainer } from '@/components/chat/chat-container';
 import { ChatInput } from '@/components/chat/chat-input';
 import { RateLimitTimer } from '@/components/chat/rate-limit-timer';
 import { MessageProps } from '@/components/chat/message';
-import { FileText, Layers, MessageCircle, LogOut } from 'lucide-react';
+import { FileText, Layers, MessageCircle, User as UserIcon, BookOpen } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { User } from '@supabase/supabase-js';
 
 interface Document {
   id: string;
@@ -27,6 +29,7 @@ interface Document {
 interface ClassContentProps {
   classId: string;
   initialDocuments: Document[];
+  user: User;
 }
 
 interface RateLimitState {
@@ -34,7 +37,7 @@ interface RateLimitState {
   provider: string;
 }
 
-export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
+export function ClassContent({ classId, initialDocuments, user }: ClassContentProps) {
   const router = useRouter();
   const { toast } = useToast();
   const supabase = createClient();
@@ -206,32 +209,44 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
 
   return (
     <>
-      <div className="flex h-screen flex-col bg-warm-50">
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-warm-200 bg-white px-4">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-warm-800">
-              <span className="font-serif text-xs font-medium text-warm-50">S</span>
-            </div>
-            <span className="font-serif text-base font-medium text-warm-800">Studium</span>
+      <div className="flex h-svh flex-col bg-background">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-6">
+          <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-90">
+            <BookOpen className="h-6 w-6 text-primary" strokeWidth={2.5} />
+            <span className="font-serif text-xl font-bold tracking-tight text-foreground">
+              Studium
+            </span>
           </Link>
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-warm-500 transition-colors hover:bg-warm-100 hover:text-warm-700"
+            title="Sign out"
+            className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-transparent ring-offset-background transition-all hover:border-primary hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           >
-            <LogOut className="h-4 w-4" />
-            Sign out
+            {user.user_metadata?.avatar_url ? (
+              <Image
+                src={user.user_metadata.avatar_url}
+                alt={user.email || 'User'}
+                fill
+                className="object-cover"
+                sizes="40px"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
+                <UserIcon className="h-5 w-5" />
+              </div>
+            )}
           </button>
         </header>
 
         <div className="flex flex-1 overflow-hidden">
-          <aside className="relative z-10 flex w-80 shrink-0 flex-col border-r border-warm-200 bg-white">
-            <div className="flex border-b border-warm-200">
+          <aside className="relative z-10 flex w-80 shrink-0 flex-col border-r border-border bg-card">
+            <div className="flex border-b border-border">
               <button
                 onClick={() => setActiveTab('documents')}
                 className={`flex flex-1 items-center justify-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
                   activeTab === 'documents'
-                    ? 'border-terracotta text-terracotta'
-                    : 'border-transparent text-warm-500 hover:text-warm-700'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <FileText className="h-4 w-4" />
@@ -241,14 +256,14 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
                 onClick={() => setActiveTab('flashcards')}
                 className={`flex flex-1 items-center justify-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
                   activeTab === 'flashcards'
-                    ? 'border-terracotta text-terracotta'
-                    : 'border-transparent text-warm-500 hover:text-warm-700'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Layers className="h-4 w-4" />
                 Flashcards
                 {flashcards.length > 0 && (
-                  <span className="rounded-full bg-warm-200 px-1.5 py-0.5 text-xs text-warm-600">
+                  <span className="rounded-full bg-secondary px-1.5 py-0.5 text-xs text-secondary-foreground">
                     {flashcards.length}
                   </span>
                 )}
@@ -273,15 +288,15 @@ export function ClassContent({ classId, initialDocuments }: ClassContentProps) {
           </aside>
 
           <main className="flex flex-1 flex-col overflow-hidden">
-            <div className="flex h-12 shrink-0 items-center gap-2 border-b border-warm-200 bg-white px-4">
-              <MessageCircle className="h-4 w-4 text-terracotta" />
-              <span className="text-sm font-medium text-warm-700">Chat with your notes</span>
+            <div className="flex h-12 shrink-0 items-center gap-2 border-b border-border bg-card px-4">
+              <MessageCircle className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium text-foreground">Chat with your notes</span>
             </div>
 
-            <div className="flex flex-1 flex-col overflow-hidden bg-gradient-to-b from-warm-50 to-white">
+            <div className="flex flex-1 flex-col overflow-hidden bg-gradient-to-b from-background to-card">
               <ChatContainer messages={messages} isLoading={isLoading} />
 
-              <div className="shrink-0 border-t border-warm-200 bg-white p-4">
+              <div className="shrink-0 border-t border-border bg-card p-4">
                 {rateLimit ? (
                   <RateLimitTimer
                     retryAfter={rateLimit.retryAfter}

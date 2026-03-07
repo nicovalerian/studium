@@ -10,61 +10,66 @@
 
 @layer base {
   :root {
-    --background: 40 33% 98%;
-    --foreground: 25 20% 18%;
-    --card: 40 30% 99%;
-    --card-foreground: 25 20% 18%;
-    --popover: 40 30% 99%;
-    --popover-foreground: 25 20% 18%;
+    /* Deep Scholarly Indigo / Botanical / Midnight Navy Theme */
+    --background: 220 25% 97%;
+    --foreground: 224 35% 15%;
 
-    --primary: 25 75% 47%;
-    --primary-foreground: 40 33% 98%;
+    --card: 220 25% 98%;
+    --card-foreground: 224 35% 15%;
 
-    --secondary: 40 25% 94%;
-    --secondary-foreground: 25 30% 35%;
+    --popover: 220 25% 98%;
+    --popover-foreground: 224 35% 15%;
 
-    --muted: 35 20% 93%;
-    --muted-foreground: 25 15% 50%;
+    --primary: 226 55% 45%;
+    --primary-foreground: 210 40% 98%;
 
-    --accent: 150 40% 45%;
-    --accent-foreground: 40 33% 98%;
+    --secondary: 215 20% 94%;
+    --secondary-foreground: 224 35% 15%;
+
+    --muted: 215 20% 94%;
+    --muted-foreground: 215 15% 50%;
+
+    --accent: 155 40% 45%;
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 65% 55%;
-    --destructive-foreground: 40 33% 98%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 35 20% 88%;
-    --input: 35 20% 88%;
-    --ring: 25 75% 47%;
+    --border: 218 20% 88%;
+    --input: 218 20% 88%;
+    --ring: 226 55% 45%;
 
-    --chart-1: 25 75% 47%;
-    --chart-2: 150 40% 45%;
-    --chart-3: 35 60% 55%;
-    --chart-4: 200 50% 50%;
+    --chart-1: 226 55% 45%;
+    --chart-2: 155 40% 45%;
+    --chart-3: 200 40% 55%;
+    --chart-4: 260 40% 55%;
     --chart-5: 280 40% 55%;
 
     --radius: 0.625rem;
 
-    --warm-50: 40 33% 98%;
-    --warm-100: 38 30% 95%;
-    --warm-200: 35 25% 90%;
-    --warm-300: 33 20% 82%;
-    --warm-400: 30 15% 65%;
-    --warm-500: 28 12% 50%;
-    --warm-600: 25 15% 38%;
-    --warm-700: 23 18% 28%;
-    --warm-800: 20 20% 20%;
-    --warm-900: 18 22% 14%;
+    /* Re-mapped Warm Scale to Cool Slate/Indigo Scale */
+    --warm-50: 220 25% 97%;
+    --warm-100: 220 20% 94%;
+    --warm-200: 218 18% 89%;
+    --warm-300: 216 15% 82%;
+    --warm-400: 215 15% 65%;
+    --warm-500: 218 15% 50%;
+    --warm-600: 220 20% 35%;
+    --warm-700: 222 25% 25%;
+    --warm-800: 224 35% 18%;
+    --warm-900: 226 45% 12%;
 
-    --terracotta: 25 75% 47%;
-    --terracotta-light: 25 75% 92%;
-    --terracotta-dark: 25 75% 38%;
+    /* Re-mapped Named Colors */
+    --terracotta: 226 55% 45%; /* Deep Indigo */
+    --terracotta-light: 226 55% 92%;
+    --terracotta-dark: 226 55% 35%;
 
-    --sage: 150 40% 45%;
-    --sage-light: 150 40% 92%;
-    --sage-dark: 150 40% 35%;
+    --sage: 155 35% 45%; /* Forest Botanical Green */
+    --sage-light: 155 35% 92%;
+    --sage-dark: 155 35% 35%;
 
-    --sand: 35 60% 55%;
-    --sand-light: 35 60% 92%;
+    --sand: 200 20% 55%; /* Slate Blue/Grey */
+    --sand-light: 200 20% 92%;
   }
 }
 
@@ -214,6 +219,6 @@
 }
 
 ::selection {
-  background: hsl(25 75% 47% / 0.15);
+  background: hsl(var(--primary) / 0.15);
   color: hsl(var(--warm-900));
 }
