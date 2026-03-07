@@ -37,7 +37,7 @@ function StatusBadge({ status }: { status: Document['embedding_status'] }) {
       return (
         <Badge
           variant="secondary"
-          className="gap-1 bg-[hsl(var(--warm-200))] text-[hsl(var(--warm-600))]"
+          className="w-fit gap-1 bg-[hsl(var(--warm-200))] text-[hsl(var(--warm-600))]"
         >
           <Loader2 className="h-3 w-3 animate-spin" />
           Pending
@@ -47,7 +47,7 @@ function StatusBadge({ status }: { status: Document['embedding_status'] }) {
       return (
         <Badge
           variant="secondary"
-          className="gap-1 bg-[hsl(var(--sand-light))] text-[hsl(var(--sand))]"
+          className="w-fit gap-1 bg-[hsl(var(--sand-light))] text-[hsl(var(--sand))]"
         >
           <Loader2 className="h-3 w-3 animate-spin" />
           Processing
@@ -55,14 +55,14 @@ function StatusBadge({ status }: { status: Document['embedding_status'] }) {
       );
     case 'completed':
       return (
-        <Badge variant="default" className="gap-1 bg-[hsl(var(--sage))] text-white">
+        <Badge variant="default" className="w-fit gap-1 bg-[hsl(var(--sage))] text-white">
           <CheckCircle className="h-3 w-3" />
           Ready
         </Badge>
       );
     case 'failed':
       return (
-        <Badge variant="destructive" className="gap-1">
+        <Badge variant="destructive" className="w-fit gap-1">
           <XCircle className="h-3 w-3" />
           Failed
         </Badge>
@@ -237,7 +237,7 @@ export function DocumentList({ documents, onDocumentsDeleted }: DocumentListProp
                 : 'border-[hsl(var(--warm-200))] hover:border-[hsl(var(--warm-300))] hover:bg-[hsl(var(--warm-100))]'
             }`}
           >
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 flex-1 items-center gap-3">
               <Checkbox
                 checked={selectedIds.has(doc.id)}
                 onCheckedChange={() => toggleSelection(doc.id)}
@@ -245,11 +245,11 @@ export function DocumentList({ documents, onDocumentsDeleted }: DocumentListProp
                 className="border-[hsl(var(--warm-300))] data-[state=checked]:border-primary data-[state=checked]:bg-primary"
               />
               <FileText className="h-5 w-5 text-[hsl(var(--warm-400))]" />
-              <div className="flex-1">
-                <p className="font-medium text-[hsl(var(--warm-800))]">
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium text-[hsl(var(--warm-800))]">
                   {doc.display_name || doc.filename}
                 </p>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col items-start gap-1">
                   <p className="text-xs text-[hsl(var(--warm-500))]">
                     {new Date(doc.created_at).toLocaleDateString()}
                   </p>
@@ -317,3 +317,4 @@ export function DocumentList({ documents, onDocumentsDeleted }: DocumentListProp
     </div>
   );
 }
+

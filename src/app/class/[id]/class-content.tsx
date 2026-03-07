@@ -1,19 +1,28 @@
-'use client';
+﻿'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { FileUpload } from '@/components/documents/file-upload';
 import { DocumentList } from '@/components/documents/document-list';
 import { FlashcardSection } from '@/components/flashcards/flashcard-section';
 import { Flashcard } from '@/components/flashcards/flashcard-item';
 import { Toaster } from '@/components/ui/toaster';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { createClient } from '@/lib/supabase/client';
 import { ChatContainer } from '@/components/chat/chat-container';
 import { ChatInput } from '@/components/chat/chat-input';
 import { RateLimitTimer } from '@/components/chat/rate-limit-timer';
 import { MessageProps } from '@/components/chat/message';
-import { FileText, Layers, MessageCircle, User as UserIcon, BookOpen } from 'lucide-react';
+import {
+  FileText,
+  Layers,
+  MessageCircle,
+  User as UserIcon,
+  BookOpen,
+  LogOut,
+  Trash2,
+} from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { User } from '@supabase/supabase-js';
@@ -41,17 +50,33 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
   const router = useRouter();
   const { toast } = useToast();
   const supabase = createClient();
+  const profileControlsRef = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [isLoading, setIsLoading] = useState(false);
+  const [isClearingChat, setIsClearingChat] = useState(false);
   const [rateLimit, setRateLimit] = useState<RateLimitState | null>(null);
   const [activeTab, setActiveTab] = useState<'documents' | 'flashcards'>('documents');
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   useEffect(() => {
     setDocuments(initialDocuments);
   }, [initialDocuments]);
+
+  useEffect(() => {
+    if (!isProfileMenuOpen) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!profileControlsRef.current?.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [isProfileMenuOpen]);
 
   const refreshDocuments = useCallback(async () => {
     const { data, error } = await supabase
@@ -132,6 +157,8 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
   }, [documents, refreshDocuments]);
 
   const handleSendMessage = async (content: string) => {
+    if (isClearingChat) return;
+
     const userMessage: MessageProps = { role: 'user', content };
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
@@ -194,6 +221,56 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
     }
   };
 
+  const handleClearChat = async () => {
+    if (isLoading || isClearingChat || messages.length === 0) return;
+
+    setIsClearingChat(true);
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ class_id: classId }),
+      });
+
+      let data: Record<string, unknown> = {};
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        data = await response.json();
+      }
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          toast({
+            title: 'Session expired',
+            description: 'Please sign in again to continue chatting.',
+            variant: 'destructive',
+          });
+          router.push('/login');
+          return;
+        }
+
+        const serverError = typeof data.error === 'string' ? data.error : null;
+        throw new Error(serverError || 'Failed to clear chat history.');
+      }
+
+      setMessages([]);
+      setRateLimit(null);
+      toast({
+        title: 'Chat cleared',
+        description: 'This chat context has been reset.',
+      });
+    } catch (error) {
+      console.error('Error clearing chat:', error);
+      toast({
+        title: 'Failed to clear chat',
+        description: error instanceof Error ? error.message : 'An error occurred.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsClearingChat(false);
+    }
+  };
+
   const handleRateLimitComplete = () => {
     setRateLimit(null);
     toast({
@@ -203,8 +280,19 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push('/');
+    const { error } = await supabase.auth.signOut({ scope: 'global' });
+
+    if (error) {
+      toast({
+        title: 'Error signing out',
+        description: error.message,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsProfileMenuOpen(false);
+    router.push('/login');
   };
 
   return (
@@ -217,25 +305,49 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
               Studium
             </span>
           </Link>
-          <button
-            onClick={handleSignOut}
-            title="Sign out"
-            className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-transparent ring-offset-background transition-all hover:border-primary hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-          >
-            {user.user_metadata?.avatar_url ? (
-              <Image
-                src={user.user_metadata.avatar_url}
-                alt={user.email || 'User'}
-                fill
-                className="object-cover"
-                sizes="40px"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
-                <UserIcon className="h-5 w-5" />
-              </div>
-            )}
-          </button>
+
+          <div ref={profileControlsRef} className="flex items-center gap-2">
+            <div
+              className={`origin-right overflow-hidden transition-all duration-300 ease-out ${
+                isProfileMenuOpen
+                  ? 'max-w-[160px] translate-x-0 opacity-100'
+                  : 'pointer-events-none max-w-0 translate-x-2 opacity-0'
+              }`}
+            >
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-9 whitespace-nowrap"
+                onClick={handleSignOut}
+              >
+                <LogOut className="mr-1.5 h-4 w-4" />
+                Sign out
+              </Button>
+            </div>
+
+            <button
+              onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+              title="Profile"
+              aria-label="Open profile actions"
+              aria-expanded={isProfileMenuOpen}
+              className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-transparent ring-offset-background transition-all hover:border-primary hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            >
+              {user.user_metadata?.avatar_url ? (
+                <Image
+                  src={user.user_metadata.avatar_url}
+                  alt={user.email || 'User'}
+                  fill
+                  className="object-cover"
+                  sizes="40px"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
+                  <UserIcon className="h-5 w-5" />
+                </div>
+              )}
+            </button>
+          </div>
         </header>
 
         <div className="flex flex-1 overflow-hidden">
@@ -288,9 +400,22 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
           </aside>
 
           <main className="flex flex-1 flex-col overflow-hidden">
-            <div className="flex h-12 shrink-0 items-center gap-2 border-b border-border bg-card px-4">
-              <MessageCircle className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-foreground">Chat with your notes</span>
+            <div className="flex h-12 shrink-0 items-center justify-between border-b border-border bg-card px-4">
+              <div className="flex items-center gap-2">
+                <MessageCircle className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium text-foreground">Chat with your notes</span>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 gap-1.5 px-2 text-xs"
+                onClick={handleClearChat}
+                disabled={isLoading || isClearingChat || messages.length === 0}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                {isClearingChat ? 'Clearing...' : 'Clear chat'}
+              </Button>
             </div>
 
             <div className="flex flex-1 flex-col overflow-hidden bg-gradient-to-b from-background to-card">
@@ -305,7 +430,7 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
                 ) : (
                   <ChatInput
                     onSend={handleSendMessage}
-                    isLoading={isLoading}
+                    isLoading={isLoading || isClearingChat}
                     placeholder={
                       documents.length === 0
                         ? 'Upload documents to start chatting...'
