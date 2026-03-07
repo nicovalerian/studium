@@ -1,4 +1,5 @@
 import { generateMockEmbedding } from '@/lib/ai/providers/mock';
+import { sanitizeUnpairedSurrogates } from './unicode';
 
 const HF_INFERENCE_BASE_URL = 'https://router.huggingface.co/hf-inference/models';
 const DEFAULT_MODEL = 'sentence-transformers/all-MiniLM-L6-v2';
@@ -13,6 +14,8 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     throw new Error('Missing HUGGINGFACE_API_KEY');
   }
 
+  const safeText = sanitizeUnpairedSurrogates(text);
+
   const model = process.env.HUGGINGFACE_EMBEDDING_MODEL || DEFAULT_MODEL;
   const url = `${HF_INFERENCE_BASE_URL}/${model}/pipeline/feature-extraction`;
 
@@ -23,7 +26,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      inputs: text,
+      inputs: safeText,
     }),
   });
 
