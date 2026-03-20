@@ -140,6 +140,20 @@
     @apply bg-gradient-to-r from-[hsl(var(--terracotta))] to-[hsl(var(--sand))] bg-clip-text text-transparent;
   }
 
+  .reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(24px) scale(0.985);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s ease;
+    will-change: opacity, transform;
+  }
+
+  .reveal-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
   @keyframes fade-in {
     from {
       opacity: 0;
@@ -196,6 +210,15 @@
   }
   .stagger-4 {
     animation-delay: 0.4s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-on-scroll,
+  .reveal-on-scroll.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
 

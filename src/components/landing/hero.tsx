@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { Logo } from '@/components/branding/logo';
 import { SiteHeader } from '@/components/landing/site-header';
+import { Reveal } from '@/components/landing/reveal';
 
 export function Hero() {
   return (
@@ -22,13 +22,7 @@ export function Hero() {
 
       <div className="container relative mx-auto flex min-h-[100vh] flex-col items-center justify-center px-6 pb-16 pt-32 sm:pt-36 lg:pb-24 lg:pt-40">
         <div className="mx-auto max-w-4xl text-center">
-          <div className="animate-fade-in mb-8 flex justify-center">
-            <div className="inline-flex items-center rounded-full border border-white/70 bg-white/80 px-3 py-2 shadow-[0_22px_60px_-38px_rgba(15,23,42,0.45)] backdrop-blur-xl">
-              <Logo size="sm" showTagline />
-            </div>
-          </div>
-
-          <div className="animate-fade-in stagger-1 mb-8">
+          <div className="animate-fade-in mb-8">
             <span className="badge-warm border border-terracotta/10 bg-white/70 shadow-sm backdrop-blur-sm">
               Notes in. Clarity out.
             </span>
@@ -43,8 +37,8 @@ export function Hero() {
           </h1>
 
           <p className="animate-fade-in stagger-2 mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-warm-600 opacity-0 sm:text-xl">
-            Studium turns lecture slides, PDFs, and reading notes into a focused study
-            workspace with grounded chat, instant flashcards, and a cleaner review flow.
+            Turn lecture slides, PDFs, and reading notes into a focused study workspace with
+            grounded chat, instant flashcards, and a cleaner review flow.
           </p>
 
           <div className="animate-fade-in stagger-3 mt-12 flex flex-col items-center justify-center gap-4 opacity-0 sm:flex-row">
@@ -73,7 +67,7 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="animate-slide-up stagger-4 mt-20 w-full max-w-5xl opacity-0">
+        <Reveal className="mt-20 w-full max-w-5xl" delay={180}>
           <div className="overflow-hidden rounded-[2rem] border border-white/70 bg-white/85 shadow-[0_48px_120px_-56px_rgba(15,23,42,0.55)] backdrop-blur-xl">
             <div className="border-b border-warm-200 bg-white/90 px-5 py-4">
               <div className="flex items-center justify-between gap-4">
@@ -83,7 +77,7 @@ export function Hero() {
                   <div className="h-3 w-3 rounded-full bg-emerald-300" />
                 </div>
                 <div className="rounded-full border border-warm-200 bg-warm-50 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-warm-500">
-                  Studium workspace
+                  Study workspace
                 </div>
               </div>
             </div>
@@ -194,7 +188,7 @@ export function Hero() {
               </div>
             </div>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { Hero } from '@/components/landing/hero';
 import { Features } from '@/components/landing/features';
-import { CTA } from '@/components/landing/cta';
 import { Footer } from '@/components/landing/footer';
 
 export default async function Home() {
@@ -19,7 +18,6 @@ export default async function Home() {
     <main className="flex min-h-screen flex-col">
       <Hero />
       <Features />
-      <CTA />
       <Footer />
     </main>
   );
