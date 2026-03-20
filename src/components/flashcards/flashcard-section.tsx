@@ -6,12 +6,15 @@ import { FlashcardItem, Flashcard } from './flashcard-item';
 import { Layers, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import type { WorkspaceAccessState } from '@/lib/auth/access';
 
 interface FlashcardSectionProps {
-  classId: string;
+  classId: string | null;
   flashcards: Flashcard[];
   onFlashcardsChange: (flashcards: Flashcard[]) => void;
   hasDocuments: boolean;
+  workspaceState?: WorkspaceAccessState;
+  onBlockedAction?: () => void;
 }
 
 export function FlashcardSection({
@@ -19,7 +22,11 @@ export function FlashcardSection({
   flashcards,
   onFlashcardsChange,
   hasDocuments,
+  workspaceState = 'verified',
+  onBlockedAction,
 }: FlashcardSectionProps) {
+  const isReadOnly = workspaceState !== 'verified';
+
   const handleGenerateComplete = (newFlashcards: Flashcard[]) => {
     onFlashcardsChange([...flashcards, ...newFlashcards]);
   };
@@ -48,7 +55,7 @@ export function FlashcardSection({
                 size="sm"
                 className="h-7 rounded-full bg-[hsl(var(--sage))] hover:bg-[hsl(var(--sage-dark))]"
               >
-                <Link href={`/class/${classId}/flashcards`}>
+                <Link href={classId ? `/class/${classId}/flashcards` : '/dashboard'}>
                   <Play className="mr-1 h-3 w-3" /> Study
                 </Link>
               </Button>
@@ -61,7 +68,15 @@ export function FlashcardSection({
           classId={classId}
           onGenerateComplete={handleGenerateComplete}
           disabled={!hasDocuments}
+          workspaceState={workspaceState}
+          onBlockedAction={onBlockedAction}
         />
+
+        {isReadOnly && flashcards.length > 0 ? (
+          <p className="text-center text-xs text-[hsl(var(--warm-500))]">
+            Flashcards stay read-only until {workspaceState === 'guest' ? 'you sign in' : 'your email is verified'}.
+          </p>
+        ) : null}
 
         <div className="-mr-2 flex-1 overflow-y-auto pr-2">
           {flashcards.length === 0 ? (
@@ -82,6 +97,7 @@ export function FlashcardSection({
                   flashcard={flashcard}
                   onUpdate={handleUpdate}
                   onDelete={handleDelete}
+                  isReadOnly={isReadOnly}
                 />
               ))}
             </div>

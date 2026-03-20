@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { ClassContent } from '@/app/class/[id]/class-content';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -7,7 +8,17 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect('/login');
+  if (!user) {
+    return (
+      <ClassContent
+        classId={null}
+        initialDocuments={[]}
+        user={null}
+        workspacePath="/dashboard"
+        workspaceState="guest"
+      />
+    );
+  }
 
   const { data: existingClass, error: selectError } = await supabase
     .from('classes')
@@ -46,5 +57,5 @@ export default async function DashboardPage() {
 
   if (newClass) redirect(`/class/${newClass.id}`);
 
-  return <div>Getting started...</div>;
+  return null;
 }

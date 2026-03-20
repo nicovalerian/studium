@@ -2,11 +2,26 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
-import { LoginButton } from '@/components/auth/login-button';
+import { AuthPanel } from '@/components/auth/auth-panel';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Logo } from '@/components/branding/logo';
 
-export default async function LoginPage() {
+const authFlavorTexts = [
+  'Drop in as a guest, sign in when you are ready, and pick up your next study flow from there.',
+  'Bring your notes, bring your curiosity, and settle into a study session that feels a little lighter.',
+  'Your next focused sprint can start from scratch or right where you left it.',
+  'Jump into Studium your way: quick preview first, full study mode whenever you sign in.',
+];
+
+interface LoginPageProps {
+  searchParams?: {
+    next?: string;
+    mode?: string;
+    error?: string;
+  };
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -15,6 +30,15 @@ export default async function LoginPage() {
   if (user) {
     redirect('/dashboard');
   }
+
+  const nextPath =
+    searchParams?.next && searchParams.next.startsWith('/') ? searchParams.next : '/dashboard';
+  const initialMode = searchParams?.mode === 'signup' ? 'signup' : 'signin';
+  const initialError =
+    searchParams?.error === 'auth_failed'
+      ? 'That sign-in or verification link expired. Try again from the auth screen.'
+      : null;
+  const flavorText = authFlavorTexts[Math.floor(Math.random() * authFlavorTexts.length)];
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(79,70,229,0.16),transparent_28%),radial-gradient(circle_at_85%_15%,rgba(16,185,129,0.14),transparent_28%),linear-gradient(180deg,hsl(var(--warm-50)),hsl(var(--warm-100)))] p-4">
@@ -35,14 +59,12 @@ export default async function LoginPage() {
             <Logo size="lg" showTagline />
           </div>
           <div className="space-y-2">
-            <CardTitle className="text-3xl font-bold text-warm-900">Welcome back</CardTitle>
-            <CardDescription className="text-base text-warm-500">
-              Sign in to pick up your next study session right where you left it.
-            </CardDescription>
+            <CardTitle className="text-3xl font-bold text-warm-900">Study starts here</CardTitle>
+            <CardDescription className="text-base text-warm-500">{flavorText}</CardDescription>
           </div>
         </CardHeader>
         <CardContent className="pb-8">
-          <LoginButton />
+          <AuthPanel nextPath={nextPath} initialMode={initialMode} initialError={initialError} />
         </CardContent>
       </Card>
     </div>

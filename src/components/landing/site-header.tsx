@@ -13,7 +13,7 @@ export function SiteHeader() {
       <div className="container mx-auto px-6">
         <div className="mt-6 flex items-center justify-between rounded-full border border-white/60 bg-white/75 px-4 py-3 shadow-[0_24px_80px_-48px_rgba(15,23,42,0.45)] backdrop-blur-xl">
           <Link href="/" aria-label="Studium home">
-            <Logo size="sm" />
+            <Logo size="sm" showTagline />
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex">
@@ -36,7 +36,7 @@ export function SiteHeader() {
               Sign in
             </Link>
             <Link
-              href="/login"
+              href="/dashboard"
               className="inline-flex items-center gap-2 rounded-full bg-warm-900 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-warm-800 hover:shadow-lg"
             >
               Start free

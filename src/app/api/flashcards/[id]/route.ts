@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { EMAIL_VERIFICATION_REQUIRED_ERROR_CODE } from '@/lib/auth/access';
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -10,6 +11,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  if (!user.email_confirmed_at) {
+    return NextResponse.json(
+      { error: 'Email verification required', code: EMAIL_VERIFICATION_REQUIRED_ERROR_CODE },
+      { status: 403 }
+    );
   }
 
   const body = await request.json();
@@ -46,6 +54,13 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  if (!user.email_confirmed_at) {
+    return NextResponse.json(
+      { error: 'Email verification required', code: EMAIL_VERIFICATION_REQUIRED_ERROR_CODE },
+      { status: 403 }
+    );
   }
 
   const { error } = await supabase.from('flashcards').delete().eq('id', id);

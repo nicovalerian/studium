@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirm your Studium email</title>
+  </head>
+  <body style="margin: 0; padding: 0; background: #f4f7fb; color: #13233c; font-family: Inter, Arial, sans-serif;">
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background: #f4f7fb; padding: 32px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 620px; background: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 24px 70px rgba(19, 35, 60, 0.12);">
+            <tr>
+              <td style="background: linear-gradient(135deg, #3056d3, #183a7a 62%, #2e7d60); padding: 28px 32px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td style="vertical-align: middle;">
+                      <div style="display: inline-block; height: 52px; width: 52px; border-radius: 18px; background: rgba(255, 255, 255, 0.12); vertical-align: middle;">
+                        <div style="position: relative; height: 52px; width: 52px;">
+                          <span style="position: absolute; left: 11px; top: 11px; height: 7px; width: 7px; border-radius: 999px; background: #ffffff; display: inline-block;"></span>
+                          <span style="position: absolute; left: 11px; right: 11px; top: 24px; height: 7px; border-radius: 999px; background: rgba(255, 255, 255, 0.96); display: inline-block;"></span>
+                          <span style="position: absolute; left: 11px; right: 18px; top: 34px; height: 7px; border-radius: 999px; background: rgba(255, 255, 255, 0.66); display: inline-block;"></span>
+                        </div>
+                      </div>
+                    </td>
+                    <td style="padding-left: 16px; vertical-align: middle;">
+                      <div style="font-family: 'Source Serif 4', Georgia, serif; font-size: 30px; line-height: 1; font-weight: 700; color: #ffffff;">Studium</div>
+                      <div style="margin-top: 8px; font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(255, 255, 255, 0.78);">Study in Flow</div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding: 36px 32px 18px;">
+                <div style="display: inline-block; border-radius: 999px; background: #eef4ff; color: #3056d3; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 8px 12px;">
+                  Confirm your email
+                </div>
+                <h1 style="margin: 18px 0 12px; font-family: 'Source Serif 4', Georgia, serif; font-size: 34px; line-height: 1.1; font-weight: 700; color: #13233c;">
+                  Your next calm study session is almost ready.
+                </h1>
+                <p style="margin: 0; font-size: 16px; line-height: 1.7; color: #4d5d76;">
+                  Hi {{ .Email }}, confirm your email to unlock uploads, grounded chat, and flashcard generation inside Studium.
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding: 8px 32px 18px;">
+                <a
+                  href="{{ .ConfirmationURL }}"
+                  style="display: inline-block; border-radius: 999px; background: #13233c; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; padding: 15px 26px;"
+                >
+                  Verify my email
+                </a>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding: 0 32px 26px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-radius: 18px; background: #f7f9fc; border: 1px solid #e4e9f3;">
+                  <tr>
+                    <td style="padding: 18px 20px;">
+                      <p style="margin: 0 0 10px; font-size: 13px; font-weight: 700; color: #13233c;">Why you’re seeing this</p>
+                      <p style="margin: 0; font-size: 14px; line-height: 1.7; color: #5c6b83;">
+                        Studium verifies email addresses before anyone can chat, generate flashcards, or upload files. It keeps the workspace open to explore while protecting the parts that create and store data.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding: 0 32px 32px;">
+                <p style="margin: 0 0 8px; font-size: 13px; font-weight: 700; color: #13233c;">Button not working?</p>
+                <p style="margin: 0; font-size: 13px; line-height: 1.7; color: #6b7a90; word-break: break-word;">
+                  Copy and paste this link into your browser:
+                  <br />
+                  <a href="{{ .ConfirmationURL }}" style="color: #3056d3; text-decoration: underline;">
+                    {{ .ConfirmationURL }}
+                  </a>
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="border-top: 1px solid #e8ecf4; padding: 22px 32px 28px; background: #fbfcfe;">
+                <p style="margin: 0; font-size: 12px; line-height: 1.7; color: #7a889c;">
+                  You can ignore this email if you did not create a Studium account.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

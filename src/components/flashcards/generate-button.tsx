@@ -4,18 +4,33 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import type { WorkspaceAccessState } from '@/lib/auth/access';
 
 interface GenerateButtonProps {
-  classId: string;
+  classId: string | null;
   onGenerateComplete: (newFlashcards: { id: string; front: string; back: string }[]) => void;
   disabled?: boolean;
+  workspaceState?: WorkspaceAccessState;
+  onBlockedAction?: () => void;
 }
 
-export function GenerateButton({ classId, onGenerateComplete, disabled }: GenerateButtonProps) {
+export function GenerateButton({
+  classId,
+  onGenerateComplete,
+  disabled,
+  workspaceState = 'verified',
+  onBlockedAction,
+}: GenerateButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+  const isBlocked = workspaceState !== 'verified';
 
   const handleGenerate = async () => {
+    if (isBlocked || !classId) {
+      onBlockedAction?.();
+      return;
+    }
+
     setIsGenerating(true);
     try {
       const response = await fetch('/api/flashcards/generate', {
@@ -59,13 +74,20 @@ export function GenerateButton({ classId, onGenerateComplete, disabled }: Genera
     <div className="space-y-2">
       <Button
         onClick={handleGenerate}
-        disabled={disabled || isGenerating}
+        disabled={(!isBlocked && disabled) || isGenerating}
         className="w-full bg-primary font-semibold text-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:bg-[hsl(var(--terracotta-dark))] hover:shadow-md"
       >
         {isGenerating ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Generating...
+          </>
+        ) : isBlocked ? (
+          <>
+            <Sparkles className="mr-2 h-4 w-4" />
+            {workspaceState === 'guest'
+              ? 'Sign in to generate flashcards'
+              : 'Verify email to generate'}
           </>
         ) : (
           <>
@@ -74,11 +96,18 @@ export function GenerateButton({ classId, onGenerateComplete, disabled }: Genera
           </>
         )}
       </Button>
-      {disabled && !isGenerating && (
+      {isBlocked ? (
+        <p className="text-center text-xs text-[hsl(var(--warm-500))]">
+          {workspaceState === 'guest'
+            ? 'Create an account first, then flashcards unlock right away.'
+            : 'Email verification unlocks flashcard generation.'}
+        </p>
+      ) : null}
+      {disabled && !isGenerating && !isBlocked ? (
         <p className="text-center text-xs text-[hsl(var(--warm-500))]">
           Upload and process documents first to generate flashcards
         </p>
-      )}
+      ) : null}
     </div>
   );
 }

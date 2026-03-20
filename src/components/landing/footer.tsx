@@ -16,7 +16,7 @@ const footerLinks = [
     items: [
       { href: '#how-it-works', label: 'How it works' },
       { href: '#simple-by-design', label: 'Simple by design' },
-      { href: '/login', label: 'Start studying' },
+      { href: '/dashboard', label: 'Start studying' },
     ],
   },
   {

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -23,9 +23,15 @@ import {
   LogOut,
   Trash2,
 } from 'lucide-react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { User } from '@supabase/supabase-js';
+import {
+  buildLoginHref,
+  canUseWorkspace,
+  EMAIL_VERIFICATION_REQUIRED_ERROR_CODE,
+  type WorkspaceAccessState,
+} from '@/lib/auth/access';
+import { WorkspaceAccessBanner, WorkspaceAccessDialog } from '@/components/auth/access-gate';
 
 interface Document {
   id: string;
@@ -36,9 +42,11 @@ interface Document {
 }
 
 interface ClassContentProps {
-  classId: string;
+  classId: string | null;
   initialDocuments: Document[];
-  user: User;
+  user: User | null;
+  workspaceState: WorkspaceAccessState;
+  workspacePath: string;
 }
 
 interface RateLimitState {
@@ -46,11 +54,30 @@ interface RateLimitState {
   provider: string;
 }
 
-export function ClassContent({ classId, initialDocuments, user }: ClassContentProps) {
+type BlockedAction = 'chat' | 'upload' | 'flashcards' | 'clear-chat';
+
+function buildCallbackUrl(nextPath: string) {
+  const confirmUrl = new URL('/auth/confirm', window.location.origin);
+  confirmUrl.searchParams.set('next', nextPath);
+  return confirmUrl.toString();
+}
+
+export function ClassContent({
+  classId,
+  initialDocuments,
+  user,
+  workspaceState,
+  workspacePath,
+}: ClassContentProps) {
   const router = useRouter();
   const { toast } = useToast();
-  const supabase = createClient();
+  const supabaseRef = useRef(createClient());
+  const supabase = supabaseRef.current;
   const profileControlsRef = useRef<HTMLDivElement>(null);
+  const loginHref = buildLoginHref(workspacePath);
+  const signupHref = buildLoginHref(workspacePath, 'signup');
+  const workspaceEnabled = canUseWorkspace(workspaceState);
+  const isReadOnly = !workspaceEnabled;
 
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
@@ -60,6 +87,8 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
   const [rateLimit, setRateLimit] = useState<RateLimitState | null>(null);
   const [activeTab, setActiveTab] = useState<'documents' | 'flashcards'>('documents');
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [blockedAction, setBlockedAction] = useState<BlockedAction | null>(null);
+  const [isResendingVerification, setIsResendingVerification] = useState(false);
 
   useEffect(() => {
     setDocuments(initialDocuments);
@@ -79,6 +108,8 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
   }, [isProfileMenuOpen]);
 
   const refreshDocuments = useCallback(async () => {
+    if (!classId || !user) return;
+
     const { data, error } = await supabase
       .from('documents')
       .select('id, filename, display_name, embedding_status, created_at')
@@ -91,9 +122,13 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
     }
 
     setDocuments(data || []);
-  }, [classId, supabase]);
+  }, [classId, supabase, user]);
 
   useEffect(() => {
+    if (!classId || !user) return;
+
+    let cancelled = false;
+
     const fetchMessages = async () => {
       const { data, error } = await supabase
         .from('messages')
@@ -106,7 +141,7 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
         return;
       }
 
-      if (data) {
+      if (!cancelled && data) {
         setMessages(
           data.map((msg: { role: string; content: string }) => ({
             role: msg.role as 'user' | 'assistant',
@@ -128,21 +163,27 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
         return;
       }
 
-      if (data) {
+      if (!cancelled && data) {
         setFlashcards(data);
       }
     };
 
-    fetchMessages();
-    fetchFlashcards();
-  }, [classId, supabase]);
+    void fetchMessages();
+    void fetchFlashcards();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [classId, supabase, user]);
 
   const handleUploadComplete = () => {
-    refreshDocuments();
+    void refreshDocuments();
     router.refresh();
   };
 
   useEffect(() => {
+    if (!classId || !user) return;
+
     const hasPending = documents.some(
       (doc) => doc.embedding_status === 'pending' || doc.embedding_status === 'processing'
     );
@@ -150,14 +191,56 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
     if (!hasPending) return;
 
     const intervalId = setInterval(() => {
-      refreshDocuments();
+      void refreshDocuments();
     }, 5000);
 
     return () => clearInterval(intervalId);
-  }, [documents, refreshDocuments]);
+  }, [classId, documents, refreshDocuments, user]);
+
+  const openBlockedPrompt = useCallback((action: BlockedAction) => {
+    setBlockedAction(action);
+  }, []);
+
+  const handleResendVerification = useCallback(async () => {
+    if (!user?.email) return;
+
+    setIsResendingVerification(true);
+
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: user.email,
+        options: {
+          emailRedirectTo: buildCallbackUrl(workspacePath),
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: 'Verification email resent',
+        description: `A fresh confirmation link is on its way to ${user.email}.`,
+      });
+    } catch (error) {
+      toast({
+        title: 'Could not resend email',
+        description: error instanceof Error ? error.message : 'Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsResendingVerification(false);
+    }
+  }, [supabase, toast, user?.email, workspacePath]);
 
   const handleSendMessage = async (content: string) => {
-    if (isClearingChat) return;
+    if (!workspaceEnabled) {
+      openBlockedPrompt('chat');
+      return;
+    }
+
+    if (!classId || isClearingChat) return;
 
     const userMessage: MessageProps = { role: 'user', content };
     setMessages((prev) => [...prev, userMessage]);
@@ -197,7 +280,12 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
             description: 'Please sign in again to continue chatting.',
             variant: 'destructive',
           });
-          router.push('/login');
+          router.push(loginHref);
+        } else if (
+          response.status === 403 &&
+          data.code === EMAIL_VERIFICATION_REQUIRED_ERROR_CODE
+        ) {
+          openBlockedPrompt('chat');
         } else {
           const serverError = typeof data.error === 'string' ? data.error : null;
           throw new Error(serverError || `Failed to send message (${response.status}).`);
@@ -222,7 +310,12 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
   };
 
   const handleClearChat = async () => {
-    if (isLoading || isClearingChat || messages.length === 0) return;
+    if (!workspaceEnabled) {
+      openBlockedPrompt('clear-chat');
+      return;
+    }
+
+    if (!classId || isLoading || isClearingChat || messages.length === 0) return;
 
     setIsClearingChat(true);
     try {
@@ -245,7 +338,12 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
             description: 'Please sign in again to continue chatting.',
             variant: 'destructive',
           });
-          router.push('/login');
+          router.push(loginHref);
+          return;
+        }
+
+        if (response.status === 403 && data.code === EMAIL_VERIFICATION_REQUIRED_ERROR_CODE) {
+          openBlockedPrompt('clear-chat');
           return;
         }
 
@@ -280,6 +378,11 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
   };
 
   const handleSignOut = async () => {
+    if (!user) {
+      router.push(loginHref);
+      return;
+    }
+
     const { error } = await supabase.auth.signOut({ scope: 'global' });
 
     if (error) {
@@ -299,53 +402,75 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
     <>
       <div className="flex h-svh flex-col bg-background">
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-6">
-          <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-90">
+          <div className="flex items-center gap-3">
             <Logo size="sm" />
-          </Link>
+          </div>
 
-          <div ref={profileControlsRef} className="flex items-center gap-2">
-            <div
-              className={`origin-right overflow-hidden transition-all duration-300 ease-out ${
-                isProfileMenuOpen
-                  ? 'max-w-[160px] translate-x-0 opacity-100'
-                  : 'pointer-events-none max-w-0 translate-x-2 opacity-0'
-              }`}
-            >
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-9 whitespace-nowrap"
-                onClick={handleSignOut}
+          {user ? (
+            <div ref={profileControlsRef} className="flex items-center gap-2">
+              <div
+                className={`origin-right overflow-hidden transition-all duration-300 ease-out ${
+                  isProfileMenuOpen
+                    ? 'max-w-[160px] translate-x-0 opacity-100'
+                    : 'pointer-events-none max-w-0 translate-x-2 opacity-0'
+                }`}
               >
-                <LogOut className="mr-1.5 h-4 w-4" />
-                Sign out
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-9 whitespace-nowrap"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="mr-1.5 h-4 w-4" />
+                  Sign out
+                </Button>
+              </div>
+
+              <button
+                onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+                title="Profile"
+                aria-label="Open profile actions"
+                aria-expanded={isProfileMenuOpen}
+                className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-transparent ring-offset-background transition-all hover:border-primary hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                {user.user_metadata?.avatar_url ? (
+                  <Image
+                    src={user.user_metadata.avatar_url}
+                    alt={user.email || 'User'}
+                    fill
+                    className="object-cover"
+                    sizes="40px"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
+                    <UserIcon className="h-5 w-5" />
+                  </div>
+                )}
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={() => router.push(loginHref)}>
+                Sign in
+              </Button>
+              <Button type="button" size="sm" onClick={() => router.push(signupHref)}>
+                Create account
               </Button>
             </div>
-
-            <button
-              onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-              title="Profile"
-              aria-label="Open profile actions"
-              aria-expanded={isProfileMenuOpen}
-              className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-transparent ring-offset-background transition-all hover:border-primary hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              {user.user_metadata?.avatar_url ? (
-                <Image
-                  src={user.user_metadata.avatar_url}
-                  alt={user.email || 'User'}
-                  fill
-                  className="object-cover"
-                  sizes="40px"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
-                  <UserIcon className="h-5 w-5" />
-                </div>
-              )}
-            </button>
-          </div>
+          )}
         </header>
+
+        {workspaceState !== 'verified' ? (
+          <WorkspaceAccessBanner
+            state={workspaceState}
+            email={user?.email}
+            nextPath={workspacePath}
+            isResendingVerification={isResendingVerification}
+            onResendVerification={handleResendVerification}
+            onRefresh={() => router.refresh()}
+          />
+        ) : null}
 
         <div className="flex flex-1 overflow-hidden">
           <aside className="relative z-10 flex w-80 shrink-0 flex-col border-r border-border bg-card">
@@ -371,19 +496,28 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
               >
                 <Layers className="h-4 w-4" />
                 Flashcards
-                {flashcards.length > 0 && (
+                {flashcards.length > 0 ? (
                   <span className="rounded-full bg-secondary px-1.5 py-0.5 text-xs text-secondary-foreground">
                     {flashcards.length}
                   </span>
-                )}
+                ) : null}
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4">
               {activeTab === 'documents' ? (
                 <div className="space-y-4">
-                  <FileUpload classId={classId} onUploadComplete={handleUploadComplete} />
-                  <DocumentList documents={documents} onDocumentsDeleted={refreshDocuments} />
+                  <FileUpload
+                    classId={classId}
+                    onUploadComplete={handleUploadComplete}
+                    workspaceState={workspaceState}
+                    onBlockedAction={() => openBlockedPrompt('upload')}
+                  />
+                  <DocumentList
+                    documents={documents}
+                    onDocumentsDeleted={() => void refreshDocuments()}
+                    isReadOnly={isReadOnly}
+                  />
                 </div>
               ) : (
                 <FlashcardSection
@@ -391,6 +525,8 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
                   flashcards={flashcards}
                   onFlashcardsChange={setFlashcards}
                   hasDocuments={documents.some((doc) => doc.embedding_status === 'completed')}
+                  workspaceState={workspaceState}
+                  onBlockedAction={() => openBlockedPrompt('flashcards')}
                 />
               )}
             </div>
@@ -408,7 +544,7 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
                 size="sm"
                 className="h-8 gap-1.5 px-2 text-xs"
                 onClick={handleClearChat}
-                disabled={isLoading || isClearingChat || messages.length === 0}
+                disabled={workspaceEnabled ? isLoading || isClearingChat || messages.length === 0 : false}
               >
                 <Trash2 className="h-3.5 w-3.5" />
                 {isClearingChat ? 'Clearing...' : 'Clear chat'}
@@ -428,10 +564,16 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
                   <ChatInput
                     onSend={handleSendMessage}
                     isLoading={isLoading || isClearingChat}
+                    workspaceState={workspaceState}
+                    onBlockedAction={() => openBlockedPrompt('chat')}
                     placeholder={
-                      documents.length === 0
-                        ? 'Upload documents to start chatting...'
-                        : 'Ask something about your notes...'
+                      workspaceState === 'guest'
+                        ? 'Sign in to ask about your notes...'
+                        : workspaceState === 'unverified'
+                          ? 'Verify your email to unlock chat...'
+                          : documents.length === 0
+                            ? 'Upload documents to start chatting...'
+                            : 'Ask something about your notes...'
                     }
                   />
                 )}
@@ -440,6 +582,24 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
           </main>
         </div>
       </div>
+
+      {workspaceState !== 'verified' ? (
+        <WorkspaceAccessDialog
+          state={workspaceState}
+          action={blockedAction}
+          email={user?.email}
+          nextPath={workspacePath}
+          open={blockedAction !== null}
+          onOpenChange={(open) => {
+            if (!open) {
+              setBlockedAction(null);
+            }
+          }}
+          isResendingVerification={isResendingVerification}
+          onResendVerification={handleResendVerification}
+        />
+      ) : null}
+
       <Toaster />
     </>
   );

@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { chat } from '@/lib/ai/service';
 import { searchSimilarChunks, buildContext } from '@/lib/embeddings/search';
 import type { ChatMessage } from '@/lib/ai/types';
+import { EMAIL_VERIFICATION_REQUIRED_ERROR_CODE } from '@/lib/auth/access';
 
 const MAX_FALLBACK_CONTEXT_LENGTH = 4000;
 
@@ -41,6 +42,13 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  if (!user.email_confirmed_at) {
+    return NextResponse.json(
+      { error: 'Email verification required', code: EMAIL_VERIFICATION_REQUIRED_ERROR_CODE },
+      { status: 403 }
+    );
   }
 
   let body: { class_id?: string; message?: string };
@@ -220,6 +228,13 @@ export async function DELETE(request: Request) {
       console.error('Auth error:', userError);
     }
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  if (!user.email_confirmed_at) {
+    return NextResponse.json(
+      { error: 'Email verification required', code: EMAIL_VERIFICATION_REQUIRED_ERROR_CODE },
+      { status: 403 }
+    );
   }
 
   let body: { class_id?: string };

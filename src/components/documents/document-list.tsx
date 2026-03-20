@@ -29,6 +29,7 @@ interface Document {
 interface DocumentListProps {
   documents: Document[];
   onDocumentsDeleted?: () => void;
+  isReadOnly?: boolean;
 }
 
 function StatusBadge({ status }: { status: Document['embedding_status'] }) {
@@ -70,7 +71,11 @@ function StatusBadge({ status }: { status: Document['embedding_status'] }) {
   }
 }
 
-export function DocumentList({ documents, onDocumentsDeleted }: DocumentListProps) {
+export function DocumentList({
+  documents,
+  onDocumentsDeleted,
+  isReadOnly = false,
+}: DocumentListProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -162,68 +167,77 @@ export function DocumentList({ documents, onDocumentsDeleted }: DocumentListProp
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <Checkbox
-            checked={selectedIds.size === documents.length && documents.length > 0}
-            onCheckedChange={toggleSelectAll}
-            aria-label="Select all documents"
-            className="border-[hsl(var(--warm-300))] data-[state=checked]:border-primary data-[state=checked]:bg-primary"
-          />
-          <span className="text-sm text-[hsl(var(--warm-500))]">
-            {selectedIds.size > 0 ? `${selectedIds.size} selected` : 'Select all'}
-          </span>
-        </div>
+        {isReadOnly ? (
+          <p className="text-sm text-[hsl(var(--warm-500))]">Documents are view-only right now.</p>
+        ) : (
+          <>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={selectedIds.size === documents.length && documents.length > 0}
+                onCheckedChange={toggleSelectAll}
+                aria-label="Select all documents"
+                className="border-[hsl(var(--warm-300))] data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+              />
+              <span className="text-sm text-[hsl(var(--warm-500))]">
+                {selectedIds.size > 0 ? `${selectedIds.size} selected` : 'Select all'}
+              </span>
+            </div>
 
-        {selectedIds.size > 0 && (
-          <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="sm" disabled={isDeleting}>
-                {isDeleting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
-                )}
-                Delete ({selectedIds.size})
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="border-[hsl(var(--warm-200))]">
-              <AlertDialogHeader>
-                <AlertDialogTitle className="flex items-center gap-2 text-[hsl(var(--warm-800))]">
-                  <AlertTriangle className="h-5 w-5 text-destructive" />
-                  Delete {selectedIds.size} document{selectedIds.size > 1 ? 's' : ''}?
-                </AlertDialogTitle>
-                <AlertDialogDescription className="space-y-2 text-[hsl(var(--warm-600))]">
-                  <p>This action cannot be undone. The following will be permanently deleted:</p>
-                  <ul className="list-inside list-disc space-y-1 text-sm">
-                    <li>Document files from storage</li>
-                    {hasEmbeddedDocuments && (
-                      <li className="font-medium text-destructive">
-                        All embedded context and search data
-                      </li>
+            {selectedIds.size > 0 ? (
+              <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm" disabled={isDeleting}>
+                    {isDeleting ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
                     )}
-                  </ul>
-                  {hasEmbeddedDocuments && (
-                    <p className="mt-2 text-sm font-medium text-destructive">
-                      Warning: Some selected documents have already been processed. Deleting them
-                      will remove their context from the AI chat.
-                    </p>
-                  )}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel disabled={isDeleting} className="border-[hsl(var(--warm-300))]">
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleBatchDelete}
-                  disabled={isDeleting}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  {isDeleting ? 'Deleting...' : 'Delete'}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                    Delete ({selectedIds.size})
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="border-[hsl(var(--warm-200))]">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="flex items-center gap-2 text-[hsl(var(--warm-800))]">
+                      <AlertTriangle className="h-5 w-5 text-destructive" />
+                      Delete {selectedIds.size} document{selectedIds.size > 1 ? 's' : ''}?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="space-y-2 text-[hsl(var(--warm-600))]">
+                      <p>This action cannot be undone. The following will be permanently deleted:</p>
+                      <ul className="list-inside list-disc space-y-1 text-sm">
+                        <li>Document files from storage</li>
+                        {hasEmbeddedDocuments ? (
+                          <li className="font-medium text-destructive">
+                            All embedded context and search data
+                          </li>
+                        ) : null}
+                      </ul>
+                      {hasEmbeddedDocuments ? (
+                        <p className="mt-2 text-sm font-medium text-destructive">
+                          Warning: Some selected documents have already been processed. Deleting them
+                          will remove their context from the AI chat.
+                        </p>
+                      ) : null}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel
+                      disabled={isDeleting}
+                      className="border-[hsl(var(--warm-300))]"
+                    >
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleBatchDelete}
+                      disabled={isDeleting}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {isDeleting ? 'Deleting...' : 'Delete'}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            ) : null}
+          </>
         )}
       </div>
 
@@ -232,18 +246,20 @@ export function DocumentList({ documents, onDocumentsDeleted }: DocumentListProp
           <div
             key={doc.id}
             className={`flex items-center justify-between rounded-xl border p-3 transition-all duration-200 ${
-              selectedIds.has(doc.id)
+              !isReadOnly && selectedIds.has(doc.id)
                 ? 'border-primary bg-[hsl(var(--terracotta-light))]'
                 : 'border-[hsl(var(--warm-200))] hover:border-[hsl(var(--warm-300))] hover:bg-[hsl(var(--warm-100))]'
             }`}
           >
             <div className="flex min-w-0 flex-1 items-center gap-3">
-              <Checkbox
-                checked={selectedIds.has(doc.id)}
-                onCheckedChange={() => toggleSelection(doc.id)}
-                aria-label={`Select ${doc.display_name || doc.filename}`}
-                className="border-[hsl(var(--warm-300))] data-[state=checked]:border-primary data-[state=checked]:bg-primary"
-              />
+              {!isReadOnly ? (
+                <Checkbox
+                  checked={selectedIds.has(doc.id)}
+                  onCheckedChange={() => toggleSelection(doc.id)}
+                  aria-label={`Select ${doc.display_name || doc.filename}`}
+                  className="border-[hsl(var(--warm-300))] data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+                />
+              ) : null}
               <FileText className="h-5 w-5 text-[hsl(var(--warm-400))]" />
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium text-[hsl(var(--warm-800))]">
@@ -257,64 +273,66 @@ export function DocumentList({ documents, onDocumentsDeleted }: DocumentListProp
                 </div>
               </div>
             </div>
-            <div className="relative z-10">
-              <AlertDialog
-                open={singleDeleteId === doc.id}
-                onOpenChange={(open) => !open && setSingleDeleteId(null)}
-              >
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-[hsl(var(--warm-400))] hover:bg-[hsl(var(--warm-100))] hover:text-destructive"
-                    onClick={() => setSingleDeleteId(doc.id)}
-                    disabled={isDeleting}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">Delete {doc.display_name || doc.filename}</span>
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent className="border-[hsl(var(--warm-200))]">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="flex items-center gap-2 text-[hsl(var(--warm-800))]">
-                      <AlertTriangle className="h-5 w-5 text-destructive" />
-                      Delete document?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription className="space-y-2 text-[hsl(var(--warm-600))]">
-                      <p>
-                        Are you sure you want to delete &quot;{doc.display_name || doc.filename}
-                        &quot;?
-                      </p>
-                      {doc.embedding_status === 'completed' && (
-                        <p className="font-medium text-destructive">
-                          Warning: This document has been processed. Deleting it will remove its
-                          context from the AI chat.
+
+            {!isReadOnly ? (
+              <div className="relative z-10">
+                <AlertDialog
+                  open={singleDeleteId === doc.id}
+                  onOpenChange={(open) => !open && setSingleDeleteId(null)}
+                >
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-[hsl(var(--warm-400))] hover:bg-[hsl(var(--warm-100))] hover:text-destructive"
+                      onClick={() => setSingleDeleteId(doc.id)}
+                      disabled={isDeleting}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">Delete {doc.display_name || doc.filename}</span>
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="border-[hsl(var(--warm-200))]">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="flex items-center gap-2 text-[hsl(var(--warm-800))]">
+                        <AlertTriangle className="h-5 w-5 text-destructive" />
+                        Delete document?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription className="space-y-2 text-[hsl(var(--warm-600))]">
+                        <p>
+                          Are you sure you want to delete &quot;{doc.display_name || doc.filename}
+                          &quot;?
                         </p>
-                      )}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel
-                      disabled={isDeleting}
-                      className="border-[hsl(var(--warm-300))]"
-                    >
-                      Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => handleSingleDelete(doc.id)}
-                      disabled={isDeleting}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      {isDeleting ? 'Deleting...' : 'Delete'}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
+                        {doc.embedding_status === 'completed' ? (
+                          <p className="font-medium text-destructive">
+                            Warning: This document has been processed. Deleting it will remove its
+                            context from the AI chat.
+                          </p>
+                        ) : null}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel
+                        disabled={isDeleting}
+                        className="border-[hsl(var(--warm-300))]"
+                      >
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleSingleDelete(doc.id)}
+                        disabled={isDeleting}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {isDeleting ? 'Deleting...' : 'Delete'}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            ) : null}
           </div>
         ))}
       </div>
     </div>
   );
 }
-

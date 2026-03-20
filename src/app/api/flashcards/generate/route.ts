@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { generateFlashcards } from '@/lib/flashcards/generator';
+import { EMAIL_VERIFICATION_REQUIRED_ERROR_CODE } from '@/lib/auth/access';
 
 const MAX_CONTENT_LENGTH = 8000;
 const MIN_CONTENT_LENGTH = 200;
@@ -14,6 +15,13 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  if (!user.email_confirmed_at) {
+    return NextResponse.json(
+      { error: 'Email verification required', code: EMAIL_VERIFICATION_REQUIRED_ERROR_CODE },
+      { status: 403 }
+    );
   }
 
   let body: { class_id?: string; document_id?: string };

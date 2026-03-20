@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { extractText, getFileType, ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '@/lib/file-processing';
 import { generateDocumentEmbeddings } from '@/lib/embeddings/generate';
+import { EMAIL_VERIFICATION_REQUIRED_ERROR_CODE } from '@/lib/auth/access';
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -11,6 +12,13 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  if (!user.email_confirmed_at) {
+    return NextResponse.json(
+      { error: 'Email verification required', code: EMAIL_VERIFICATION_REQUIRED_ERROR_CODE },
+      { status: 403 }
+    );
   }
 
   const formData = await request.formData();

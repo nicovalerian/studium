@@ -17,9 +17,15 @@ interface FlashcardItemProps {
   flashcard: Flashcard;
   onUpdate: (id: string, updates: Partial<Flashcard>) => void;
   onDelete: (id: string) => void;
+  isReadOnly?: boolean;
 }
 
-export function FlashcardItem({ flashcard, onUpdate, onDelete }: FlashcardItemProps) {
+export function FlashcardItem({
+  flashcard,
+  onUpdate,
+  onDelete,
+  isReadOnly = false,
+}: FlashcardItemProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editFront, setEditFront] = useState(flashcard.front);
@@ -161,30 +167,32 @@ export function FlashcardItem({ flashcard, onUpdate, onDelete }: FlashcardItemPr
           </p>
         </div>
 
-        <div className="absolute right-2 top-2 z-10 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-8 w-8 rounded-full bg-white/80 shadow-sm hover:bg-white"
-            onClick={(e: React.MouseEvent) => {
-              e.stopPropagation();
-              setIsEditing(true);
-            }}
-          >
-            <Pencil className="h-3.5 w-3.5 text-[hsl(var(--warm-600))]" />
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-8 w-8 rounded-full bg-white/80 shadow-sm hover:bg-red-50 hover:text-red-600"
-            onClick={(e: React.MouseEvent) => {
-              e.stopPropagation();
-              handleDelete();
-            }}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-        </div>
+        {!isReadOnly ? (
+          <div className="absolute right-2 top-2 z-10 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 rounded-full bg-white/80 shadow-sm hover:bg-white"
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                setIsEditing(true);
+              }}
+            >
+              <Pencil className="h-3.5 w-3.5 text-[hsl(var(--warm-600))]" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 rounded-full bg-white/80 shadow-sm hover:bg-red-50 hover:text-red-600"
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                handleDelete();
+              }}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        ) : null}
       </div>
     </div>
   );

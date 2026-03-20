@@ -43,7 +43,7 @@ export function Hero() {
 
           <div className="animate-fade-in stagger-3 mt-12 flex flex-col items-center justify-center gap-4 opacity-0 sm:flex-row">
             <Link
-              href="/login"
+              href="/dashboard"
               className="btn-warm group flex items-center gap-2 rounded-full px-7 text-lg shadow-[0_24px_70px_-34px_rgba(79,70,229,0.8)]"
             >
               Start studying
