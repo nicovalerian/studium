@@ -14,12 +14,12 @@ import { ChatContainer } from '@/components/chat/chat-container';
 import { ChatInput } from '@/components/chat/chat-input';
 import { RateLimitTimer } from '@/components/chat/rate-limit-timer';
 import { MessageProps } from '@/components/chat/message';
+import { Logo } from '@/components/branding/logo';
 import {
   FileText,
   Layers,
   MessageCircle,
   User as UserIcon,
-  BookOpen,
   LogOut,
   Trash2,
 } from 'lucide-react';
@@ -300,10 +300,7 @@ export function ClassContent({ classId, initialDocuments, user }: ClassContentPr
       <div className="flex h-svh flex-col bg-background">
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-6">
           <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-90">
-            <BookOpen className="h-6 w-6 text-primary" strokeWidth={2.5} />
-            <span className="font-serif text-xl font-bold tracking-tight text-foreground">
-              Studium
-            </span>
+            <Logo size="sm" />
           </Link>
 
           <div ref={profileControlsRef} className="flex items-center gap-2">
