@@ -8,6 +8,7 @@ interface LogoProps {
   theme?: LogoTheme;
   className?: string;
   showTagline?: boolean;
+  tagline?: string;
 }
 
 const sizeStyles = {
@@ -69,6 +70,7 @@ export function Logo({
   theme = 'default',
   className,
   showTagline = false,
+  tagline = 'Study in flow',
 }: LogoProps) {
   const sizeStyle = sizeStyles[size];
   const themeStyle = themeStyles[theme];
@@ -107,7 +109,7 @@ export function Logo({
               themeStyle.subtitle
             )}
           >
-            Study in flow
+            {tagline}
           </span>
         ) : null}
       </span>

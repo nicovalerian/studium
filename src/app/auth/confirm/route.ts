@@ -12,11 +12,12 @@ export async function GET(request: NextRequest) {
       : request.nextUrl.origin;
   const tokenHash = searchParams.get('token_hash');
   const type = searchParams.get('type') as EmailOtpType | null;
+  const code = searchParams.get('code');
   const next = searchParams.get('next') ?? '/dashboard';
   const safeNext = next.startsWith('/') ? next : '/dashboard';
+  const supabase = await createClient();
 
   if (tokenHash && type) {
-    const supabase = await createClient();
     const { error } = await supabase.auth.verifyOtp({
       token_hash: tokenHash,
       type,
@@ -25,6 +26,22 @@ export async function GET(request: NextRequest) {
     if (!error) {
       return NextResponse.redirect(new URL(safeNext, resolvedOrigin));
     }
+  }
+
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (!error) {
+      return NextResponse.redirect(new URL(safeNext, resolvedOrigin));
+    }
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user?.email_confirmed_at) {
+    return NextResponse.redirect(new URL(safeNext, resolvedOrigin));
   }
 
   const errorUrl = new URL('/login', resolvedOrigin);

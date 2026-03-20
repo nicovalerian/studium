@@ -75,7 +75,7 @@ export function GenerateButton({
       <Button
         onClick={handleGenerate}
         disabled={(!isBlocked && disabled) || isGenerating}
-        className="w-full bg-primary font-semibold text-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:bg-[hsl(var(--terracotta-dark))] hover:shadow-md"
+        className="h-auto min-h-11 w-full whitespace-normal px-4 py-3 text-center font-semibold leading-snug text-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:bg-[hsl(var(--terracotta-dark))] hover:shadow-md"
       >
         {isGenerating ? (
           <>

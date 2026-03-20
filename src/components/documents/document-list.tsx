@@ -17,6 +17,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface Document {
   id: string;
@@ -30,6 +31,7 @@ interface DocumentListProps {
   documents: Document[];
   onDocumentsDeleted?: () => void;
   isReadOnly?: boolean;
+  blurEmptyState?: boolean;
 }
 
 function StatusBadge({ status }: { status: Document['embedding_status'] }) {
@@ -75,6 +77,7 @@ export function DocumentList({
   documents,
   onDocumentsDeleted,
   isReadOnly = false,
+  blurEmptyState = false,
 }: DocumentListProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
@@ -157,7 +160,14 @@ export function DocumentList({
 
   if (documents.length === 0) {
     return (
-      <div className="py-8 text-center text-[hsl(var(--warm-500))]">
+      <div
+        className={cn(
+          'py-8 text-center text-[hsl(var(--warm-500))]',
+          blurEmptyState &&
+            '-mt-6 rounded-2xl border border-dashed border-[hsl(var(--warm-200))]/80 bg-[hsl(var(--warm-100))]/80 px-4 pt-10 text-[hsl(var(--warm-500))]/70 blur-[2px] opacity-70'
+        )}
+        aria-hidden={blurEmptyState}
+      >
         <FileText className="mx-auto h-12 w-12 text-[hsl(var(--warm-300))]" />
         <p className="mt-2">No documents uploaded yet</p>
       </div>

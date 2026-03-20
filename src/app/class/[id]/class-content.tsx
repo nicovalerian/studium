@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FileUpload } from '@/components/documents/file-upload';
 import { DocumentList } from '@/components/documents/document-list';
@@ -403,7 +404,9 @@ export function ClassContent({
       <div className="flex h-svh flex-col bg-background">
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-6">
           <div className="flex items-center gap-3">
-            <Logo size="sm" />
+            <Link href="/" aria-label="Back to Studium home">
+              <Logo size="sm" showTagline tagline="Study with flow" />
+            </Link>
           </div>
 
           {user ? (
@@ -465,7 +468,6 @@ export function ClassContent({
           <WorkspaceAccessBanner
             state={workspaceState}
             email={user?.email}
-            nextPath={workspacePath}
             isResendingVerification={isResendingVerification}
             onResendVerification={handleResendVerification}
             onRefresh={() => router.refresh()}
@@ -517,6 +519,7 @@ export function ClassContent({
                     documents={documents}
                     onDocumentsDeleted={() => void refreshDocuments()}
                     isReadOnly={isReadOnly}
+                    blurEmptyState={workspaceState === 'guest'}
                   />
                 </div>
               ) : (

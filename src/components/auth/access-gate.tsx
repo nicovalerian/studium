@@ -1,7 +1,6 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -27,7 +26,6 @@ type GuardedAction =
 interface WorkspaceAccessBannerProps {
   state: GuardedWorkspaceState;
   email?: string | null;
-  nextPath: string;
   isResendingVerification?: boolean;
   onResendVerification?: () => void;
   onRefresh?: () => void;
@@ -56,7 +54,6 @@ const actionLabels: Record<GuardedAction, string> = {
 export function WorkspaceAccessBanner({
   state,
   email,
-  nextPath,
   isResendingVerification = false,
   onResendVerification,
   onRefresh,
@@ -64,7 +61,7 @@ export function WorkspaceAccessBanner({
   if (state === 'guest') {
     return (
       <div className="border-b border-border bg-[linear-gradient(90deg,rgba(59,130,246,0.06),rgba(16,185,129,0.04))] px-4 py-3">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-3">
           <div className="flex items-start gap-3">
             <div className="rounded-2xl bg-primary/10 p-2 text-primary">
               <Sparkles className="h-5 w-5" />
@@ -73,18 +70,9 @@ export function WorkspaceAccessBanner({
               <p className="text-sm font-semibold text-foreground">Guest preview is live</p>
               <p className="text-sm text-muted-foreground">
                 Explore the dashboard first. Sign in when you are ready to upload files, chat, and
-                generate flashcards.
+                generate flashcards. Use the navbar whenever you want to continue.
               </p>
             </div>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <Button asChild size="sm" variant="outline">
-              <Link href={buildLoginHref(nextPath)}>Sign in</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href={buildLoginHref(nextPath, 'signup')}>Create account</Link>
-            </Button>
           </div>
         </div>
       </div>
