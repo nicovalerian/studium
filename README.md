@@ -1,127 +1,136 @@
 # Studium
 
-An AI-powered study companion that helps you learn from your documents. Upload PDFs and Word documents, chat with an AI tutor about the content, and generate flashcards for effective studying.
+Studium is a document-first study workspace built with Next.js and Supabase. Users can preview the workspace as a guest, sign in with Google or email/password, upload PDF or DOCX files, chat against retrieved document context, and generate flashcards from processed study materials.
 
-## Features
+## What the app does
 
-- **Document Upload**: Upload PDF and DOCX files to create your study materials
-- **AI Chat**: Ask questions about your documents with context-aware AI responses
-- **Flashcard Generation**: Automatically generate flashcards from your documents
-- **Secure Storage**: Documents are stored securely with per-user access control
+- Guest users can explore the dashboard before signing in.
+- Verified users can upload PDF and DOCX files up to 10 MB.
+- Uploaded documents are parsed, chunked, embedded, and indexed in Supabase pgvector.
+- Chat responses use retrieval over document chunks with a small document-content fallback when retrieval returns nothing.
+- Flashcards are generated from completed documents and stored per class.
+- Email verification gates uploads, chat, flashcard generation, and document management.
 
-## Tech Stack
+## Stack
 
-- **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
-- **Backend**: Next.js API Routes
-- **Database**: Supabase (PostgreSQL with pgvector)
-- **AI Chat**: DigitalOcean Gradient AI Platform (Llama 3.3 70B via Serverless Inference)
-- **Embeddings**: HuggingFace Inference API (all-MiniLM-L6-v2)
-- **Authentication**: Supabase Auth with Google OAuth
-- **Deployment**: DigitalOcean App Platform
+- Next.js 14 App Router with React 18 and TypeScript
+- Supabase for auth, Postgres, storage, and SSR session handling
+- DigitalOcean Gradient AI for chat and flashcard generation
+- HuggingFace Inference API for embeddings
+- Tailwind CSS, Radix UI, Vitest, Playwright, and Lighthouse CI
 
-## Quick Start
-
-### Prerequisites
+## Prerequisites
 
 - Node.js 18+
-- DigitalOcean account (with Gradient AI Platform access)
-- HuggingFace account (free)
-- Supabase account
+- An npm-compatible environment
+- A Supabase project
+- A DigitalOcean Gradient API key
+- A HuggingFace access token
 
-### 1. Clone and Install
+Google OAuth is optional, but the current UI includes a Google sign-in button. Email/password auth also works and requires email confirmation before protected actions are unlocked.
+
+## Local setup
+
+### 1. Install dependencies
 
 ```bash
-git clone https://github.com/nicovalerian/studium.git
-cd studium
 npm install
 ```
 
-### 2. Set Up Environment Variables
+### 2. Configure environment variables
 
 ```bash
 cp .env.local.example .env.local
 ```
 
-Edit `.env.local` with your credentials:
+Fill in the values in `.env.local`:
 
 ```env
-# Supabase
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
-# DigitalOcean Gradient AI Platform
 DO_GRADIENT_API_KEY=your-do-gradient-api-key
 DO_GRADIENT_CHAT_MODEL=llama3.3-70b-instruct
 
-# HuggingFace
 HUGGINGFACE_API_KEY=hf_your-token
 HUGGINGFACE_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
 ```
 
-### 3. Set Up Supabase
+Optional for local UI and test work:
 
-1. Create a new Supabase project
-2. Run `supabase/schema.sql` in the SQL Editor
-3. Create a `documents` storage bucket (private)
-4. Run `supabase/storage-policies.sql` in the SQL Editor
+```env
+MOCK_EXTERNAL_APIS=1
+```
 
-### 4. Set Up DigitalOcean Gradient AI Platform
+That mock flag short-circuits external chat and embedding calls.
 
-1. Go to [DigitalOcean Gradient AI Platform](https://cloud.digitalocean.com/gen-ai)
-2. Navigate to **Serverless Inference** tab
-3. Create a **Model Access Key**
-4. Copy the key to `DO_GRADIENT_API_KEY`
+### 3. Set up Supabase
 
-### 5. Set Up HuggingFace
+1. Run [`supabase/schema.sql`](./supabase/schema.sql) in the Supabase SQL editor.
+2. Create a private storage bucket named `documents`.
+3. Run [`supabase/storage-policies.sql`](./supabase/storage-policies.sql).
+4. In Supabase Auth, set the site URL to your app origin.
+5. Add these redirect URLs:
+   - `http://localhost:3000/auth/callback`
+   - `http://localhost:3000/auth/confirm`
 
-1. Go to [HuggingFace Settings](https://huggingface.co/settings/tokens)
-2. Create a new access token (read permissions)
-3. Copy the token to `HUGGINGFACE_API_KEY`
+If you use Google OAuth, also configure the Google provider in Supabase. The repository includes an optional confirmation email template at [`supabase/templates/confirmation.html`](./supabase/templates/confirmation.html).
 
-### 6. Run Development Server
+### 4. Start the app
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000).
 
 ## Scripts
 
-| Command            | Description               |
-| ------------------ | ------------------------- |
-| `npm run dev`      | Start development server  |
-| `npm run build`    | Build for production      |
-| `npm run start`    | Start production server   |
-| `npm run test`     | Run tests in watch mode   |
-| `npm run test:run` | Run tests once            |
-| `npm run lint`     | Run ESLint                |
-| `npm run format`   | Format code with Prettier |
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the Next.js dev server |
+| `npm run build` | Build the production app |
+| `npm run start` | Start the production server |
+| `npm run lint` | Run Next.js linting |
+| `npm run format` | Format the repo with Prettier |
+| `npm run format:check` | Check Prettier formatting |
+| `npm run test` | Run Vitest in watch mode |
+| `npm run test:run` | Run Vitest once |
+| `npm run test:coverage` | Run Vitest with coverage |
+| `npm run e2e` | Run Playwright end-to-end tests |
+| `npm run e2e:ui` | Open Playwright UI mode |
+| `npm run lighthouse` | Run Lighthouse CI |
 
-## Project Structure
+## Project layout
 
-```
+```text
 src/
-├── app/                    # Next.js app router pages
-│   ├── api/               # API routes
-│   ├── class/             # Class pages (chat, flashcards)
-│   ├── dashboard/         # Dashboard page
-│   └── login/             # Login page
-├── components/            # React components
-├── lib/                   # Shared utilities
-│   ├── ai/               # AI service (DO Gradient provider)
-│   ├── embeddings/       # Embedding generation (HuggingFace)
-│   ├── file-processing/  # PDF and DOCX parsing
-│   ├── flashcards/       # Flashcard generation
-│   └── supabase/         # Supabase client utilities
-└── test/                  # Test files
+|- app/
+|  |- api/              # Upload, chat, flashcard, and document routes
+|  |- auth/             # OAuth and email confirmation handlers
+|  |- class/            # Main study workspace
+|  |- dashboard/        # Guest preview and class bootstrap
+|  `- login/            # Sign-in and sign-up flow
+|- components/
+|  |- auth/
+|  |- chat/
+|  |- documents/
+|  |- flashcards/
+|  `- landing/
+|- hooks/
+|- lib/
+|  |- ai/
+|  |- auth/
+|  |- embeddings/
+|  |- file-processing/
+|  |- flashcards/
+|  `- supabase/
+|- test/
+`- types/
 ```
 
 ## Deployment
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions using DigitalOcean App Platform with GitHub Student Pack credits.
-
-## License
-
-MIT
+Deployment notes live in [`DEPLOYMENT.md`](./DEPLOYMENT.md). That guide is intentionally scoped to the current stack and auth flow instead of the original bootstrap-only notes.

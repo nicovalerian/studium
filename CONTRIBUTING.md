@@ -1,41 +1,33 @@
 # Contributing to Studium
 
-Thank you for your interest in contributing to Studium!
+Keep changes small, verifiable, and consistent with the current product behavior. If you change user-visible flows, data shape, or deployment requirements, update the relevant documentation in the same pass.
 
-## Development Setup
+## Development workflow
 
-1. Fork the repository
-2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/studium.git`
-3. Install dependencies: `npm install`
-4. Copy `.env.local.example` to `.env.local` and fill in your API keys
-5. Start the dev server: `npm run dev`
+1. Install dependencies with `npm install`.
+2. Copy `.env.local.example` to `.env.local`.
+3. Run `npm run dev`.
+4. Use `MOCK_EXTERNAL_APIS=1` when you want to exercise the UI without live AI providers.
 
-## Code Style
+## Before opening a PR
 
-- We use ESLint and Prettier for code formatting
-- Run `npm run lint` to check for linting errors
-- Run `npm run format` to auto-format code
-- TypeScript strict mode is enabled
+Run the checks that match your change:
 
-## Commit Messages
+- `npm run lint`
+- `npm run format:check`
+- `npm run test:run`
+- `npm run build`
+- `npm run e2e` for changes that affect critical browser flows
 
-Use conventional commit format:
+## Coding expectations
 
-- `feat:` New feature
-- `fix:` Bug fix
-- `docs:` Documentation changes
-- `refactor:` Code refactoring
-- `test:` Adding/updating tests
-- `chore:` Maintenance tasks
+- Keep TypeScript strict-mode compatible.
+- Do not commit secrets from `.env.local`.
+- Preserve guest preview, email verification gating, and per-user data isolation unless the change is intentionally redesigning those rules.
+- Update docs when setup steps, auth redirects, scripts, or provider requirements change.
 
-## Pull Requests
+## Commit and PR notes
 
-1. Create a feature branch: `git checkout -b feat/your-feature`
-2. Make your changes
-3. Run tests: `npm run test:run`
-4. Run build: `npm run build`
-5. Push and create a PR
-
-## Questions?
-
-Open an issue for any questions or suggestions.
+- Prefer conventional commit prefixes such as `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, and `chore:`.
+- Describe any required environment, schema, or deployment follow-up in the PR description.
+- Include screenshots or short notes for UI changes when they help reviewers confirm behavior quickly.
