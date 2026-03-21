@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Monitor, Smartphone } from 'lucide-react';
 import { Logo } from '@/components/branding/logo';
@@ -10,24 +10,15 @@ import { cn } from '@/lib/utils';
 interface DesktopOnlyGateProps {
   children: React.ReactNode;
   homeHref?: string;
-  storageKey?: string;
 }
-
-const DEFAULT_STORAGE_KEY = 'studium-mobile-workspace-override';
 
 export function DesktopOnlyGate({
   children,
   homeHref = '/',
-  storageKey = DEFAULT_STORAGE_KEY,
 }: DesktopOnlyGateProps) {
   const [allowMobileView, setAllowMobileView] = useState(false);
 
-  useEffect(() => {
-    setAllowMobileView(window.sessionStorage.getItem(storageKey) === 'true');
-  }, [storageKey]);
-
   const continueOnMobile = () => {
-    window.sessionStorage.setItem(storageKey, 'true');
     setAllowMobileView(true);
   };
 
