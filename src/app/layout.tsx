@@ -23,6 +23,11 @@ export const metadata: Metadata = {
     'Upload your study materials, chat about your notes, and create flashcards. A thoughtful space for learning.',
   keywords: ['study', 'AI', 'flashcards', 'education', 'learning', 'notes', 'PDF'],
   authors: [{ name: 'Studium' }],
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
   openGraph: {
     title: 'Studium - Your Study Companion',
     description: 'Upload your study materials, chat about your notes, and create flashcards.',

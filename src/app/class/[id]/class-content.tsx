@@ -33,6 +33,7 @@ import {
   type WorkspaceAccessState,
 } from '@/lib/auth/access';
 import { WorkspaceAccessBanner, WorkspaceAccessDialog } from '@/components/auth/access-gate';
+import { DesktopOnlyGate } from '@/components/layout/desktop-only-gate';
 
 interface Document {
   id: string;
@@ -400,7 +401,8 @@ export function ClassContent({
   };
 
   return (
-    <>
+    <DesktopOnlyGate>
+      <>
       <div className="flex h-svh flex-col bg-background">
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-6">
           <div className="flex items-center gap-3">
@@ -604,6 +606,7 @@ export function ClassContent({
       ) : null}
 
       <Toaster />
-    </>
+      </>
+    </DesktopOnlyGate>
   );
 }

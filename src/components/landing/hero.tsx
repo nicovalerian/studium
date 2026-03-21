@@ -5,7 +5,7 @@ import { Reveal } from '@/components/landing/reveal';
 
 export function Hero() {
   return (
-    <section className="relative min-h-[100vh] overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(79,70,229,0.14),transparent_30%),radial-gradient(circle_at_85%_18%,rgba(16,185,129,0.12),transparent_28%),linear-gradient(180deg,hsl(var(--warm-50)),rgba(255,255,255,0.96)_48%,hsl(var(--warm-100)))]">
+    <section className="relative z-10 min-h-[100vh] overflow-x-hidden bg-[radial-gradient(circle_at_top_left,rgba(79,70,229,0.14),transparent_30%),radial-gradient(circle_at_85%_18%,rgba(16,185,129,0.12),transparent_28%),linear-gradient(180deg,hsl(var(--warm-50)),rgba(255,255,255,0.96)_48%,hsl(var(--warm-100)))]">
       <SiteHeader />
 
       <div className="absolute inset-0 opacity-60">
@@ -20,7 +20,7 @@ export function Hero() {
 
       <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-white to-transparent" />
 
-      <div className="container relative mx-auto flex min-h-[100vh] flex-col items-center justify-center px-6 pb-16 pt-32 sm:pt-36 lg:pb-24 lg:pt-40">
+      <div className="container relative mx-auto flex min-h-[100vh] flex-col items-center justify-center px-6 pb-28 pt-32 sm:pt-36 lg:pb-36 lg:pt-40">
         <div className="mx-auto max-w-4xl text-center">
           <div className="animate-fade-in mb-8">
             <span className="badge-warm border border-terracotta/10 bg-white/70 shadow-sm backdrop-blur-sm">
@@ -68,7 +68,7 @@ export function Hero() {
         </div>
 
         <Reveal className="mt-20 w-full max-w-5xl" delay={180}>
-          <div className="overflow-hidden rounded-[2rem] border border-white/70 bg-white/85 shadow-[0_48px_120px_-56px_rgba(15,23,42,0.55)] backdrop-blur-xl">
+          <div className="overflow-hidden rounded-[2rem] border border-white/70 bg-white/85 shadow-[0_42px_96px_-48px_rgba(15,23,42,0.45)] backdrop-blur-xl">
             <div className="border-b border-warm-200 bg-white/90 px-5 py-4">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex gap-2">
