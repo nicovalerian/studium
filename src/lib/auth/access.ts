@@ -19,11 +19,19 @@ export function canUseWorkspace(state: WorkspaceAccessState) {
 }
 
 export function buildLoginHref(nextPath: string, mode: AuthMode = 'signin') {
-  const params = new URLSearchParams({ next: nextPath });
+  const params = new URLSearchParams({ next: getSafeNextPath(nextPath) });
 
   if (mode === 'signup') {
     params.set('mode', 'signup');
   }
 
   return `/login?${params.toString()}`;
+}
+
+export function getSafeNextPath(nextPath: string | null | undefined, fallback = '/dashboard') {
+  if (!nextPath || !nextPath.startsWith('/')) {
+    return fallback;
+  }
+
+  return nextPath.startsWith('//') ? fallback : nextPath;
 }

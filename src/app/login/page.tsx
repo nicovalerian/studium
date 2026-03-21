@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import { AuthPanel } from '@/components/auth/auth-panel';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Logo } from '@/components/branding/logo';
+import { getSafeNextPath } from '@/lib/auth/access';
 
 const authFlavorTexts = [
   'Drop in as a guest, sign in when you are ready, and pick up your next study flow from there.',
@@ -22,17 +23,16 @@ interface LoginPageProps {
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const nextPath = getSafeNextPath(searchParams?.next);
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (user) {
-    redirect('/dashboard');
+    redirect(nextPath);
   }
 
-  const nextPath =
-    searchParams?.next && searchParams.next.startsWith('/') ? searchParams.next : '/dashboard';
   const initialMode = searchParams?.mode === 'signup' ? 'signup' : 'signin';
   const initialError =
     searchParams?.error === 'auth_failed'

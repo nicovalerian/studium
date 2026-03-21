@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { buildLoginHref } from '@/lib/auth/access';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -36,7 +37,9 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith('/api/');
 
   if (!user && !isPublicRoute) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    const nextPath = `${pathname}${request.nextUrl.search}`;
+    const loginUrl = new URL(buildLoginHref(nextPath), request.url);
+    return NextResponse.redirect(loginUrl);
   }
 
   return supabaseResponse;
