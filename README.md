@@ -1,43 +1,84 @@
-# Studium
+<div align="center">
 
-Studium is a document-first study workspace built with Next.js and Supabase. Users can preview the workspace as a guest, sign in with Google or email/password, upload PDF or DOCX files, chat against retrieved document context, and generate flashcards from processed study materials.
+# 📚 Studium
 
-## What the app does
+**AI-Powered Study Workspace**
 
-- Guest users can explore the dashboard before signing in.
-- Verified users can upload PDF and DOCX files up to 10 MB.
-- Uploaded documents are parsed, chunked, embedded, and indexed in Supabase pgvector.
-- Chat responses use retrieval over document chunks with a small document-content fallback when retrieval returns nothing.
-- Flashcards are generated from completed documents and stored per class.
-- Email verification gates uploads, chat, flashcard generation, and document management.
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Platform-green?style=flat&logo=supabase&logoColor=white)](https://supabase.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-## Stack
+Transform your study materials into an interactive AI-powered workspace. Upload documents, chat with your content using retrieval-augmented generation, and generate flashcards automatically.
 
-- Next.js 14 App Router with React 18 and TypeScript
-- Supabase for auth, Postgres, storage, and SSR session handling
-- DigitalOcean Gradient AI for chat and flashcard generation
-- HuggingFace Inference API for embeddings
-- Tailwind CSS, Radix UI, Vitest, Playwright, and Lighthouse CI
+[Features](#-features) • [Quick Start](#-quick-start) • [Stack](#-stack) • [Documentation](#-documentation)
 
-## Prerequisites
+</div>
 
-- Node.js 18+
-- An npm-compatible environment
-- A Supabase project
-- A DigitalOcean Gradient API key
-- A HuggingFace access token
+---
 
-Google OAuth is optional, but the current UI includes a Google sign-in button. Email/password auth also works and requires email confirmation before protected actions are unlocked.
+## ✨ Features
 
-## Local setup
+### 🎯 Core Capabilities
 
-### 1. Install dependencies
+- **📄 Document Upload** - Support for PDF and DOCX files (up to 10 MB)
+- **🤖 AI-Powered Chat** - Context-aware conversations using RAG (Retrieval-Augmented Generation)
+- **🎴 Flashcard Generation** - Automatically create study flashcards from your documents
+- **👁️ Guest Preview** - Explore the dashboard before signing in
+
+### 🔐 Authentication & Security
+
+- **Multiple Auth Methods** - Email/password or Google OAuth
+- **Email Verification** - Required before accessing protected features
+- **Secure Storage** - Private document storage with Row Level Security
+
+### 🚀 Document Processing Pipeline
+
+1. **Parse** - Extract text from PDF/DOCX files
+2. **Chunk** - Intelligently split content into 500-character segments
+3. **Embed** - Generate 384-dimensional vectors using HuggingFace
+4. **Index** - Store in Supabase pgvector for fast similarity search
+5. **Retrieve** - Power chat with context-aware responses
+
+## 🛠️ Stack
+
+| Category | Technologies |
+|----------|-------------|
+| **Frontend** | Next.js 14 (App Router), React 18, TypeScript (strict mode) |
+| **Styling** | Tailwind CSS, Radix UI (shadcn/ui components) |
+| **Backend** | Supabase (Auth, Postgres, Storage, SSR) |
+| **AI/ML** | DigitalOcean Gradient AI, HuggingFace Inference API |
+| **Database** | PostgreSQL with pgvector extension |
+| **Testing** | Vitest (unit), Playwright (E2E), Lighthouse CI |
+| **Code Quality** | ESLint, Prettier |
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- **Node.js** 18+ with npm
+- **Supabase** project ([create one free](https://supabase.com))
+- **DigitalOcean Gradient** API key ([get started](https://www.digitalocean.com/))
+- **HuggingFace** access token ([create token](https://huggingface.co/settings/tokens))
+
+> **Note:** Google OAuth is optional. The app fully supports email/password authentication with email confirmation.
+
+### Installation
+
+**1. Clone the repository**
+
+```bash
+git clone https://github.com/nicovalerian/studium.git
+cd studium
+```
+
+**2. Install dependencies**
 
 ```bash
 npm install
 ```
 
-### 2. Configure environment variables
+**3. Configure environment variables**
 
 ```bash
 cp .env.local.example .env.local
@@ -64,9 +105,9 @@ Optional for local UI and test work:
 MOCK_EXTERNAL_APIS=1
 ```
 
-That mock flag short-circuits external chat and embedding calls.
+> **💡 Tip:** Set `MOCK_EXTERNAL_APIS=1` to bypass external AI calls during local UI development.
 
-### 3. Set up Supabase
+**4. Set up Supabase**
 
 1. Run [`supabase/schema.sql`](./supabase/schema.sql) in the Supabase SQL editor.
 2. Create a private storage bucket named `documents`.
@@ -76,17 +117,23 @@ That mock flag short-circuits external chat and embedding calls.
    - `http://localhost:3000/auth/callback`
    - `http://localhost:3000/auth/confirm`
 
-If you use Google OAuth, also configure the Google provider in Supabase. The repository includes an optional confirmation email template at [`supabase/templates/confirmation.html`](./supabase/templates/confirmation.html).
+**Optional:** Configure Google OAuth provider in Supabase and use the email template at [`supabase/templates/confirmation.html`](./supabase/templates/confirmation.html).
 
-### 4. Start the app
+**5. Start the development server**
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Scripts
+## 📖 Documentation
+
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - Development guidelines and testing practices
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Production deployment guide
+- **[Supabase Schema](./supabase/schema.sql)** - Complete database schema
+
+## 📜 Available Scripts
 
 | Command | Description |
 | --- | --- |
@@ -103,34 +150,72 @@ Open [http://localhost:3000](http://localhost:3000).
 | `npm run e2e:ui` | Open Playwright UI mode |
 | `npm run lighthouse` | Run Lighthouse CI |
 
-## Project layout
+## 📁 Project Structure
 
 ```text
-src/
-|- app/
-|  |- api/              # Upload, chat, flashcard, and document routes
-|  |- auth/             # OAuth and email confirmation handlers
-|  |- class/            # Main study workspace
-|  |- dashboard/        # Guest preview and class bootstrap
-|  `- login/            # Sign-in and sign-up flow
-|- components/
-|  |- auth/
-|  |- chat/
-|  |- documents/
-|  |- flashcards/
-|  `- landing/
-|- hooks/
-|- lib/
-|  |- ai/
-|  |- auth/
-|  |- embeddings/
-|  |- file-processing/
-|  |- flashcards/
-|  `- supabase/
-|- test/
-`- types/
+studium/
+├── src/
+│   ├── app/
+│   │   ├── api/              # API routes (upload, chat, flashcards, documents)
+│   │   ├── auth/             # OAuth and email confirmation handlers
+│   │   ├── class/            # Main study workspace
+│   │   ├── dashboard/        # Guest preview and class bootstrap
+│   │   └── login/            # Sign-in and sign-up flow
+│   ├── components/
+│   │   ├── auth/             # Authentication components
+│   │   ├── chat/             # Chat interface
+│   │   ├── documents/        # Document management
+│   │   ├── flashcards/       # Flashcard UI
+│   │   ├── landing/          # Landing page
+│   │   └── ui/               # Radix UI components (shadcn/ui)
+│   ├── hooks/                # Custom React hooks
+│   ├── lib/
+│   │   ├── ai/               # AI provider abstraction
+│   │   ├── auth/             # Auth helpers and access control
+│   │   ├── embeddings/       # Text chunking and embedding generation
+│   │   ├── file-processing/  # PDF/DOCX parsers
+│   │   ├── flashcards/       # Flashcard generation logic
+│   │   └── supabase/         # Supabase client utilities
+│   ├── test/                 # Test utilities and setup
+│   └── types/                # TypeScript type definitions
+├── supabase/
+│   ├── schema.sql            # Database schema
+│   ├── storage-policies.sql  # Storage RLS policies
+│   └── templates/            # Email templates
+├── e2e/                      # Playwright end-to-end tests
+└── scripts/                  # Build and utility scripts
 ```
 
-## Deployment
+## 🤝 Contributing
 
-Deployment notes live in [`DEPLOYMENT.md`](./DEPLOYMENT.md). That guide is intentionally scoped to the current stack and auth flow instead of the original bootstrap-only notes.
+Contributions are welcome! Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines, testing practices, and code conventions.
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests and linting (`npm run lint && npm run test:run`)
+5. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with [Next.js](https://nextjs.org/) and [Supabase](https://supabase.com/)
+- UI components from [shadcn/ui](https://ui.shadcn.com/)
+- AI powered by [DigitalOcean Gradient](https://www.digitalocean.com/) and [HuggingFace](https://huggingface.co/)
+
+---
+
+<div align="center">
+
+**[⬆ back to top](#-studium)**
+
+Made with ❤️ for students everywhere
+
+</div>

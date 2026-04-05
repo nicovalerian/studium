@@ -1,7 +1,27 @@
 {
   "name": "studium",
   "version": "0.1.0",
-  "private": true,
+  "description": "AI-powered study workspace built with Next.js and Supabase. Upload documents, chat with AI using RAG, and generate flashcards automatically.",
+  "author": "Nico Valerian",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nicovalerian/studium.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nicovalerian/studium/issues"
+  },
+  "homepage": "https://github.com/nicovalerian/studium#readme",
+  "keywords": [
+    "study",
+    "ai",
+    "rag",
+    "flashcards",
+    "nextjs",
+    "supabase",
+    "education",
+    "learning"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
