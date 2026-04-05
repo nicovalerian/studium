@@ -38,3 +38,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# npm global installs
+.npm-global/
+
+# GitHub Copilot
+.github/copilot-instructions.md
