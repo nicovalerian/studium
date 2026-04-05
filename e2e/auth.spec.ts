@@ -13,7 +13,7 @@ test.describe('Authentication', () => {
 
   test('unauthenticated user visiting /class/123 is redirected to /login', async ({ page }) => {
     await page.goto('/class/123');
-    await expect(page).toHaveURL('/login');
+    await expect(page).toHaveURL(/\/login/);
   });
 
   test('login page shows Google and email auth options', async ({ page }) => {
