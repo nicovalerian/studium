@@ -1,4 +1,4 @@
-export const FLASHCARD_GENERATION_PROMPT = `Based on the following study material, generate exactly 10 flashcards to help a student learn the key concepts.
+const FLASHCARD_GENERATION_PROMPT = `Based on the following study material, generate exactly 10 flashcards to help a student learn the key concepts.
 
 STUDY MATERIAL:
 {content}
@@ -16,7 +16,7 @@ Focus on:
 
 IMPORTANT: Return ONLY the JSON array, no markdown code blocks or other text.`;
 
-export const FLASHCARD_RETRY_SUFFIX =
+const FLASHCARD_RETRY_SUFFIX =
   '\n\nCRITICAL: Return ONLY a valid JSON array with no additional text.';
 
 export function buildFlashcardPrompt(content: string, isRetry: boolean = false): string {

@@ -29,9 +29,3 @@ export interface DocumentChunk {
   content: string;
   similarity: number;
 }
-
-export interface ChatSource {
-  document_id: string;
-  document_name: string;
-  chunk_preview: string;
-}

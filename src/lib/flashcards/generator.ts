@@ -9,7 +9,7 @@ const FlashcardSchema = z.object({
 
 const FlashcardsArraySchema = z.array(FlashcardSchema).min(5).max(15);
 
-export type GeneratedFlashcard = z.infer<typeof FlashcardSchema>;
+type GeneratedFlashcard = z.infer<typeof FlashcardSchema>;
 
 function extractJson(text: string): string {
   const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);

@@ -25,17 +25,17 @@ function getModel(): string {
   return process.env.DO_GRADIENT_CHAT_MODEL || DEFAULT_MODEL;
 }
 
-export interface DOGradientResult {
+interface DOGradientResult {
   content: string;
   rateLimited: false;
 }
 
-export interface DOGradientRateLimited {
+interface DOGradientRateLimited {
   rateLimited: true;
   retryAfter: number;
 }
 
-export type DOGradientResponse = DOGradientResult | DOGradientRateLimited;
+type DOGradientResponse = DOGradientResult | DOGradientRateLimited;
 
 export async function chatWithDOGradient(
   systemPrompt: string,

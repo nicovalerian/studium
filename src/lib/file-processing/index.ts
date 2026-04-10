@@ -1,9 +1,9 @@
 import { extractTextFromPdf, wasTruncated as pdfTruncated } from './pdf';
 import { extractTextFromDocx, wasTruncated as docxTruncated } from './docx';
 
-export type FileType = 'pdf' | 'docx';
+type FileType = 'pdf' | 'docx';
 
-export interface ExtractionResult {
+interface ExtractionResult {
   text: string;
   wasTruncated: boolean;
 }
