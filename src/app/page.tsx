@@ -4,7 +4,7 @@ import { Footer } from '@/components/landing/footer';
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col">
+    <main id="main-content" className="flex min-h-screen flex-col" tabIndex={-1}>
       <Hero />
       <Features />
       <Footer />

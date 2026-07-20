@@ -10,34 +10,33 @@
 
 @layer base {
   :root {
-    /* Deep Scholarly Indigo / Botanical / Midnight Navy Theme */
-    --background: 220 25% 97%;
-    --foreground: 224 35% 15%;
+    --background: 248 33% 98%;
+    --foreground: 238 33% 13%;
 
-    --card: 220 25% 98%;
-    --card-foreground: 224 35% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 238 33% 13%;
 
     --popover: 220 25% 98%;
     --popover-foreground: 224 35% 15%;
 
-    --primary: 226 55% 45%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 248 74% 58%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 215 20% 94%;
-    --secondary-foreground: 224 35% 15%;
+    --secondary: 247 35% 94%;
+    --secondary-foreground: 242 31% 22%;
 
-    --muted: 215 20% 94%;
-    --muted-foreground: 215 15% 50%;
+    --muted: 244 24% 95%;
+    --muted-foreground: 238 12% 43%;
 
-    --accent: 155 40% 45%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 158 66% 39%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 65% 55%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 218 20% 88%;
-    --input: 218 20% 88%;
-    --ring: 226 55% 45%;
+    --border: 244 20% 88%;
+    --input: 244 20% 84%;
+    --ring: 248 74% 58%;
 
     --chart-1: 226 55% 45%;
     --chart-2: 155 40% 45%;
@@ -45,28 +44,28 @@
     --chart-4: 260 40% 55%;
     --chart-5: 280 40% 55%;
 
-    --radius: 0.625rem;
+    --radius: 0.85rem;
 
     /* Re-mapped Warm Scale to Cool Slate/Indigo Scale */
-    --warm-50: 220 25% 97%;
-    --warm-100: 220 20% 94%;
-    --warm-200: 218 18% 89%;
-    --warm-300: 216 15% 82%;
-    --warm-400: 215 15% 65%;
-    --warm-500: 218 15% 50%;
-    --warm-600: 220 20% 35%;
-    --warm-700: 222 25% 25%;
-    --warm-800: 224 35% 18%;
-    --warm-900: 226 45% 12%;
+    --warm-50: 248 33% 98%;
+    --warm-100: 246 28% 95%;
+    --warm-200: 244 20% 88%;
+    --warm-300: 242 16% 78%;
+    --warm-400: 240 12% 61%;
+    --warm-500: 238 12% 43%;
+    --warm-600: 238 18% 32%;
+    --warm-700: 240 25% 24%;
+    --warm-800: 240 31% 17%;
+    --warm-900: 239 38% 11%;
 
     /* Re-mapped Named Colors */
-    --terracotta: 226 55% 45%; /* Deep Indigo */
-    --terracotta-light: 226 55% 92%;
-    --terracotta-dark: 226 55% 35%;
+    --terracotta: 248 74% 58%;
+    --terracotta-light: 248 72% 95%;
+    --terracotta-dark: 248 67% 48%;
 
-    --sage: 155 35% 45%; /* Forest Botanical Green */
-    --sage-light: 155 35% 92%;
-    --sage-dark: 155 35% 35%;
+    --sage: 158 66% 39%;
+    --sage-light: 153 45% 93%;
+    --sage-dark: 160 70% 27%;
 
     --sand: 200 20% 55%; /* Slate Blue/Grey */
     --sand-light: 200 20% 92%;
@@ -83,6 +82,7 @@
     font-feature-settings:
       'rlig' 1,
       'calt' 1;
+    min-width: 320px;
   }
 
   h1,
@@ -91,7 +91,7 @@
   h4,
   h5,
   h6 {
-    @apply font-semibold tracking-tight text-[hsl(var(--warm-800))];
+    @apply font-display font-semibold tracking-tight text-[hsl(var(--warm-800))];
   }
 }
 
@@ -137,7 +137,18 @@
   }
 
   .text-gradient-warm {
-    @apply bg-gradient-to-r from-[hsl(var(--terracotta))] to-[hsl(var(--sand))] bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-[hsl(var(--terracotta))] to-[hsl(var(--sage))] bg-clip-text text-transparent;
+  }
+
+  .app-grid {
+    background-image:
+      linear-gradient(hsl(var(--warm-200) / 0.28) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--warm-200) / 0.28) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .surface-panel {
+    @apply border border-white/70 bg-white/85 shadow-[0_24px_80px_-42px_rgba(28,25,72,0.28)] backdrop-blur-xl;
   }
 
   .reveal-on-scroll {
@@ -214,6 +225,15 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
   .reveal-on-scroll,
   .reveal-on-scroll.is-visible {
     opacity: 1;

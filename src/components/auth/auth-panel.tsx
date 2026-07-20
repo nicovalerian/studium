@@ -176,11 +176,11 @@ export function AuthPanel({ nextPath, initialMode, initialError }: AuthPanelProp
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-2 rounded-full border border-warm-200 bg-warm-100 p-1">
+      <div className="grid grid-cols-2 gap-1.5 rounded-xl border border-warm-200 bg-warm-100 p-1.5">
         <Button
           type="button"
           variant={mode === 'signin' ? 'default' : 'ghost'}
-          className="rounded-full"
+          className="min-h-10 rounded-lg"
           onClick={() => {
             clearMessages();
             setMode('signin');
@@ -191,7 +191,7 @@ export function AuthPanel({ nextPath, initialMode, initialError }: AuthPanelProp
         <Button
           type="button"
           variant={mode === 'signup' ? 'default' : 'ghost'}
-          className="rounded-full"
+          className="min-h-10 rounded-lg"
           onClick={() => {
             clearMessages();
             setMode('signup');
@@ -208,7 +208,7 @@ export function AuthPanel({ nextPath, initialMode, initialError }: AuthPanelProp
           <span className="w-full border-t border-warm-200" />
         </div>
         <div className="relative flex justify-center text-xs uppercase tracking-[0.22em] text-warm-400">
-          <span className="bg-white px-3">Or use email</span>
+          <span className="bg-white px-3">Or continue with email</span>
         </div>
       </div>
 
@@ -243,7 +243,7 @@ export function AuthPanel({ nextPath, initialMode, initialError }: AuthPanelProp
           />
         </div>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <Button type="submit" className="h-11 w-full rounded-xl" disabled={isSubmitting}>
           {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
           {mode === 'signin' ? 'Sign in with email' : 'Create account with email'}
         </Button>
@@ -259,8 +259,9 @@ export function AuthPanel({ nextPath, initialMode, initialError }: AuthPanelProp
               <div>
                 <p className="font-semibold">Verify your email to unlock Studium</p>
                 <p className="mt-1 text-amber-800/80">
-                  We sent a Studium verification link to <span className="font-medium">{verificationEmail}</span>.
-                  Once you confirm it, we will send you straight to the dashboard.
+                  We sent a Studium verification link to{' '}
+                  <span className="font-medium">{verificationEmail}</span>. Once you confirm it, we
+                  will send you straight to the dashboard.
                 </p>
               </div>
               <Button

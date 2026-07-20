@@ -130,10 +130,10 @@ export function FileUpload({
       <div className="relative">
         <div
           {...getRootProps()}
-          className={`cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-all duration-200 ${
+          className={`cursor-pointer rounded-2xl border border-dashed p-5 text-center transition-all duration-200 lg:p-6 ${
             isDragActive
               ? 'border-primary bg-[hsl(var(--terracotta-light))]'
-              : 'border-[hsl(var(--warm-300))] hover:border-primary/50 hover:bg-[hsl(var(--warm-100))]'
+              : 'border-[hsl(var(--warm-300))] bg-warm-50 hover:border-primary/60 hover:bg-secondary/70'
           } ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
         >
           <input {...getInputProps()} />

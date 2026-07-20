@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
-import { Source_Serif_4, Inter } from 'next/font/google';
+import { Lexend, Source_Sans_3 } from 'next/font/google';
 import './globals.css';
 
-const sourceSerif = Source_Serif_4({
+const lexend = Lexend({
   subsets: ['latin'],
-  variable: '--font-serif',
+  variable: '--font-display',
   display: 'swap',
 });
 
-const inter = Inter({
+const sourceSans = Source_Sans_3({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
@@ -54,7 +54,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${sourceSerif.variable} font-sans antialiased`}>
+      <body className={`${sourceSans.variable} ${lexend.variable} font-sans antialiased`}>
+        <a
+          href="#main-content"
+          className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-lg bg-warm-900 px-4 py-3 font-semibold text-white shadow-xl transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        >
+          Skip to main content
+        </a>
         {children}
       </body>
     </html>

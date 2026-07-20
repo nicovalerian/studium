@@ -38,7 +38,7 @@ export function Message({ role, content }: MessageProps) {
           <MessageContent content={content} />
 
           {!isUser && (
-            <div className="absolute -bottom-8 left-0 opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="absolute -bottom-8 left-0 opacity-100 transition-opacity sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
               <CopyButton content={content} />
             </div>
           )}

@@ -66,7 +66,7 @@ export function ChatInput({
 
   return (
     <div className="relative">
-      <div className="relative flex items-end gap-2 rounded-xl border border-warm-200 bg-warm-50 p-2 transition-colors focus-within:border-terracotta/50 focus-within:bg-white">
+      <div className="relative mx-auto flex max-w-4xl items-end gap-2 rounded-2xl border border-warm-200 bg-white p-2 shadow-[0_12px_42px_-28px_rgba(35,29,92,.45)] transition-all duration-200 focus-within:border-primary/60 focus-within:ring-4 focus-within:ring-primary/5">
         <textarea
           ref={textareaRef}
           value={input}
@@ -82,7 +82,7 @@ export function ChatInput({
           onClick={handleSend}
           disabled={(!input.trim() && !isBlocked) || isLoading}
           className={cn(
-            'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all duration-200',
+            'flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
             input.trim() || isBlocked
               ? 'bg-terracotta text-white hover:bg-terracotta-dark'
               : 'bg-warm-200 text-warm-400'

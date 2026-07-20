@@ -15,7 +15,7 @@ const features = [
     visual: 'upload',
   },
   {
-    title: 'Ask like a study partner',
+    title: 'Grounded AI chat',
     description:
       'Get grounded answers that stay close to your actual notes instead of drifting into generic summaries.',
     icon: MessageCircle,
@@ -33,7 +33,7 @@ const features = [
     accent: 'sand',
     className: 'lg:col-span-2',
     eyebrow: 'Fast conversion',
-    highlights: ['Editable cards', 'Structured review'],
+    highlights: ['One-click flashcards', 'Structured review'],
     visual: 'cards',
   },
   {
@@ -81,8 +81,7 @@ function FeatureVisual({ visual }: { visual: (typeof features)[number]['visual']
                 Drag and drop
               </div>
               <div className="mt-4 max-w-[14rem] text-sm leading-relaxed text-warm-500">
-                Drop a lecture deck, an article, or a seminar handout and let Studium sort the
-                rest.
+                Drop a lecture deck, an article, or a seminar handout and let Studium sort the rest.
               </div>
             </div>
           </div>
@@ -177,20 +176,20 @@ export function Features() {
   return (
     <section
       id="how-it-works"
-      className="bg-[linear-gradient(180deg,white,rgba(248,250,252,0.92))] py-24 sm:py-32"
+      className="relative overflow-hidden bg-[linear-gradient(180deg,white,hsl(var(--warm-50)))] py-24 sm:py-32"
     >
       <div className="container mx-auto px-6">
         <Reveal className="mx-auto max-w-3xl scroll-mt-28 text-center" delay={40}>
           <div id="simple-by-design">
-            <span className="badge-sage">Simple by design</span>
+            <span className="badge-sage">One continuous workflow</span>
             <h2 className="mt-6 font-serif text-4xl font-medium tracking-tight text-warm-900 sm:text-5xl">
-              A modern study flow,
+              From source material
               <br />
-              not a cluttered dashboard
+              to active recall
             </h2>
             <p className="mt-6 text-lg leading-relaxed text-warm-500">
-              Everything important lives in one place, with just enough structure to keep
-              studying moving and none of the usual interface noise.
+              Everything important lives in one place, with just enough structure to keep studying
+              moving and none of the usual interface noise.
             </p>
           </div>
         </Reveal>
@@ -206,7 +205,7 @@ export function Features() {
               >
                 <article
                   className={cn(
-                    'group relative flex h-full overflow-hidden rounded-[2rem] border p-6 shadow-[0_30px_80px_-48px_rgba(15,23,42,0.35)] transition-transform duration-300 hover:-translate-y-1',
+                    'group relative flex h-full overflow-hidden rounded-2xl border p-6 shadow-[0_24px_70px_-48px_rgba(35,29,92,0.35)] transition-transform duration-300 hover:-translate-y-1',
                     styles.shell
                   )}
                 >
