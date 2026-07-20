@@ -42,15 +42,15 @@ Transform your study materials into an interactive AI-powered workspace. Upload 
 
 ## 🛠️ Stack
 
-| Category | Technologies |
-|----------|-------------|
-| **Frontend** | Next.js 14 (App Router), React 18, TypeScript (strict mode) |
-| **Styling** | Tailwind CSS, Radix UI (shadcn/ui components) |
-| **Backend** | Supabase (Auth, Postgres, Storage, SSR) |
-| **AI/ML** | DigitalOcean Gradient AI, HuggingFace Inference API |
-| **Database** | PostgreSQL with pgvector extension |
-| **Testing** | Vitest (unit), Playwright (E2E), Lighthouse CI |
-| **Code Quality** | ESLint, Prettier |
+| Category         | Technologies                                                |
+| ---------------- | ----------------------------------------------------------- |
+| **Frontend**     | Next.js 14 (App Router), React 18, TypeScript (strict mode) |
+| **Styling**      | Tailwind CSS, Radix UI (shadcn/ui components)               |
+| **Backend**      | Supabase (Auth, Postgres, Storage, SSR)                     |
+| **AI/ML**        | DigitalOcean Gradient AI, HuggingFace Inference API         |
+| **Database**     | PostgreSQL with pgvector extension                          |
+| **Testing**      | Vitest (unit), Playwright (E2E), Lighthouse CI              |
+| **Code Quality** | ESLint, Prettier                                            |
 
 ## 🚀 Quick Start
 
@@ -93,7 +93,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 DO_GRADIENT_API_KEY=your-do-gradient-api-key
-DO_GRADIENT_CHAT_MODEL=llama3.3-70b-instruct
+DO_GRADIENT_CHAT_MODEL=llama-4-maverick
 
 HUGGINGFACE_API_KEY=hf_your-token
 HUGGINGFACE_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
@@ -106,6 +106,13 @@ MOCK_EXTERNAL_APIS=1
 ```
 
 > **💡 Tip:** Set `MOCK_EXTERNAL_APIS=1` to bypass external AI calls during local UI development.
+
+To verify the configured provider keys, model availability, and embedding dimensions without
+printing secrets, run:
+
+```bash
+npm run ai:check
+```
 
 **4. Set up Supabase**
 
@@ -135,20 +142,21 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📜 Available Scripts
 
-| Command | Description |
-| --- | --- |
-| `npm run dev` | Start the Next.js dev server |
-| `npm run build` | Build the production app |
-| `npm run start` | Start the production server |
-| `npm run lint` | Run Next.js linting |
-| `npm run format` | Format the repo with Prettier |
-| `npm run format:check` | Check Prettier formatting |
-| `npm run test` | Run Vitest in watch mode |
-| `npm run test:run` | Run Vitest once |
-| `npm run test:coverage` | Run Vitest with coverage |
-| `npm run e2e` | Run Playwright end-to-end tests |
-| `npm run e2e:ui` | Open Playwright UI mode |
-| `npm run lighthouse` | Run Lighthouse CI |
+| Command                 | Description                     |
+| ----------------------- | ------------------------------- |
+| `npm run dev`           | Start the Next.js dev server    |
+| `npm run build`         | Build the production app        |
+| `npm run start`         | Start the production server     |
+| `npm run lint`          | Run Next.js linting             |
+| `npm run format`        | Format the repo with Prettier   |
+| `npm run format:check`  | Check Prettier formatting       |
+| `npm run test`          | Run Vitest in watch mode        |
+| `npm run test:run`      | Run Vitest once                 |
+| `npm run test:coverage` | Run Vitest with coverage        |
+| `npm run ai:check`      | Check live AI provider health   |
+| `npm run e2e`           | Run Playwright end-to-end tests |
+| `npm run e2e:ui`        | Open Playwright UI mode         |
+| `npm run lighthouse`    | Run Lighthouse CI               |
 
 ## 📁 Project Structure
 

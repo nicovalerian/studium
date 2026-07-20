@@ -3,7 +3,7 @@ import type { ChatCompletionMessageParam } from 'openai/resources/chat/completio
 import type { ChatMessage } from '../types';
 
 const DO_GRADIENT_BASE_URL = 'https://inference.do-ai.run/v1';
-const DEFAULT_MODEL = 'llama3.3-70b-instruct';
+const DEFAULT_MODEL = 'llama-4-maverick';
 
 let client: OpenAI | null = null;
 

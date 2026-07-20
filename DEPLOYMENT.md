@@ -48,7 +48,11 @@ Create a serverless inference access key and set:
 - `DO_GRADIENT_API_KEY`
 - `DO_GRADIENT_CHAT_MODEL`
 
-The default chat model in the codebase is `llama3.3-70b-instruct`.
+The default chat model in the codebase is `llama-4-maverick`.
+
+> **Billing:** DigitalOcean Serverless Inference requires a positive prepaid balance. Do not assume
+> promotional account credits satisfy that separate gate; run the provider check before each
+> deployment and plan for inference to stop when the prepaid balance reaches zero.
 
 ### HuggingFace
 
@@ -58,6 +62,10 @@ Create an access token and set:
 - `HUGGINGFACE_EMBEDDING_MODEL`
 
 The current embedding default is `sentence-transformers/all-MiniLM-L6-v2`, and the Supabase schema expects 384-dimensional embeddings.
+
+Run `npm run ai:check` before deploying to verify both credentials, the configured DigitalOcean
+model, a minimal inference request, and the Hugging Face embedding dimensions. The check never
+prints credential values or embedding vectors.
 
 ## 3. App Platform configuration
 
@@ -69,16 +77,16 @@ Create a DigitalOcean App Platform web service with:
 
 Set these environment variables in the app:
 
-| Variable | Required | Notes |
-| --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Yes | Public origin for auth redirects |
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Browser auth key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Needed for document embedding writes |
-| `DO_GRADIENT_API_KEY` | Yes | Chat and flashcard generation |
-| `DO_GRADIENT_CHAT_MODEL` | No | Defaults to `llama3.3-70b-instruct` |
-| `HUGGINGFACE_API_KEY` | Yes | Embedding generation |
-| `HUGGINGFACE_EMBEDDING_MODEL` | No | Defaults to `sentence-transformers/all-MiniLM-L6-v2` |
+| Variable                        | Required | Notes                                                |
+| ------------------------------- | -------- | ---------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`          | Yes      | Public origin for auth redirects                     |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Yes      | Supabase project URL                                 |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes      | Browser auth key                                     |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Yes      | Needed for document embedding writes                 |
+| `DO_GRADIENT_API_KEY`           | Yes      | Chat and flashcard generation                        |
+| `DO_GRADIENT_CHAT_MODEL`        | No       | Defaults to `llama-4-maverick`                       |
+| `HUGGINGFACE_API_KEY`           | Yes      | Embedding generation                                 |
+| `HUGGINGFACE_EMBEDDING_MODEL`   | No       | Defaults to `sentence-transformers/all-MiniLM-L6-v2` |
 
 Mark secrets as encrypted in App Platform.
 
