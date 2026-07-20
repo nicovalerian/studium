@@ -1,6 +1,129 @@
 import Link from 'next/link';
-import { ArrowRight, ArrowUp, FileText, Layers3, MessageCircle, Sparkles } from 'lucide-react';
+import {
+  ArrowRight,
+  ArrowUp,
+  FileText,
+  Layers,
+  MessageCircle,
+  Sparkles,
+  Trash2,
+  Upload,
+} from 'lucide-react';
+import { Logo } from '@/components/branding/logo';
 import { SiteHeader } from '@/components/landing/site-header';
+
+function HeroProductPreview() {
+  return (
+    <div className="relative overflow-hidden rounded-[1.75rem] border border-white/15 bg-warm-100 p-2 shadow-[0_48px_120px_-36px_rgba(0,0,0,.75)]">
+      <div className="flex min-h-[31rem] flex-col overflow-hidden rounded-[1.3rem] bg-warm-100 text-warm-900 sm:min-h-[34rem]">
+        <div className="flex h-16 shrink-0 items-center justify-between bg-warm-900 px-4 text-white sm:px-5">
+          <Logo size="sm" theme="inverse" showTagline tagline="Study from source" />
+          <div className="flex items-center gap-2">
+            <span className="hidden rounded-lg border border-white/15 bg-white/[0.07] px-3 py-2 text-[10px] font-semibold text-white/85 sm:inline-flex">
+              Sign in
+            </span>
+            <span className="rounded-lg bg-primary px-3 py-2 text-[10px] font-semibold text-white">
+              Create account
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5 border-b border-primary/10 bg-secondary/70 px-4 py-2.5">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Sparkles className="h-3.5 w-3.5" />
+          </span>
+          <div className="min-w-0">
+            <div className="text-[11px] font-semibold text-warm-800">Guest preview is live</div>
+            <div className="truncate text-[9px] text-warm-500">
+              Explore the workspace first. Sign in when you are ready to continue.
+            </div>
+          </div>
+        </div>
+
+        <div className="flex min-h-0 flex-1 gap-2 bg-warm-100 p-2">
+          <aside className="hidden w-[35%] shrink-0 flex-col overflow-hidden rounded-xl border border-warm-200 bg-white sm:flex">
+            <div className="grid grid-cols-2 gap-1 border-b border-warm-200 bg-warm-50 p-1.5">
+              <div className="flex items-center justify-center gap-1.5 rounded-lg bg-white px-2 py-2 text-[10px] font-semibold text-primary shadow-sm ring-1 ring-warm-200">
+                <FileText className="h-3.5 w-3.5" /> Documents
+              </div>
+              <div className="flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[10px] font-semibold text-warm-500">
+                <Layers className="h-3.5 w-3.5" /> Flashcards
+              </div>
+            </div>
+
+            <div className="relative m-4 rounded-xl border border-dashed border-warm-200 bg-warm-50 px-3 py-7 text-center">
+              <Upload className="mx-auto h-6 w-6 text-warm-300" />
+              <div className="mt-2 text-[10px] font-semibold text-warm-500">
+                Drag & drop a file here
+              </div>
+              <div className="mt-1 text-[9px] text-warm-400">PDF or DOCX, max 10MB</div>
+              <div className="absolute inset-0 rounded-xl bg-white/55 backdrop-blur-[1px]" />
+            </div>
+            <div className="px-4 text-center text-[9px] text-warm-500">
+              Sign in to upload PDFs or DOCX files.
+            </div>
+
+            <div className="relative mx-4 mt-4 rounded-xl bg-warm-50 px-3 py-6 text-center">
+              <FileText className="mx-auto h-6 w-6 text-warm-300" />
+              <div className="mt-2 text-[10px] text-warm-400">No documents uploaded yet</div>
+              <div className="absolute inset-0 rounded-xl bg-white/45 backdrop-blur-[1px]" />
+            </div>
+          </aside>
+
+          <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-warm-200 bg-white">
+            <div className="grid grid-cols-2 gap-1 border-b border-warm-200 bg-warm-50 p-1.5 sm:hidden">
+              <div className="flex items-center justify-center gap-1.5 rounded-lg bg-white px-2 py-2 text-[10px] font-semibold text-primary shadow-sm ring-1 ring-warm-200">
+                <FileText className="h-3.5 w-3.5" /> Documents
+              </div>
+              <div className="flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[10px] font-semibold text-warm-500">
+                <Layers className="h-3.5 w-3.5" /> Flashcards
+              </div>
+            </div>
+
+            <div className="flex h-12 shrink-0 items-center justify-between border-b border-warm-200 px-3.5">
+              <div className="flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary text-primary">
+                  <MessageCircle className="h-3.5 w-3.5" />
+                </span>
+                <div>
+                  <div className="text-[11px] font-semibold">Study assistant</div>
+                  <div className="hidden text-[9px] text-warm-400 md:block">
+                    Answers grounded in your uploaded materials
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 text-[9px] font-medium text-warm-600">
+                <Trash2 className="h-3 w-3" /> Clear chat
+              </div>
+            </div>
+
+            <div className="app-grid flex min-h-0 flex-1 flex-col items-center justify-center bg-warm-50 px-5 text-center">
+              <span className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/10 bg-secondary text-primary shadow-sm">
+                <MessageCircle className="h-6 w-6" />
+              </span>
+              <div className="mt-4 font-display text-sm font-semibold">
+                Your sources are the starting point
+              </div>
+              <p className="mt-2 max-w-xs text-[10px] leading-relaxed text-warm-500">
+                Upload a course document, then ask for explanations, comparisons, examples, or a
+                quick knowledge check.
+              </p>
+            </div>
+
+            <div className="relative border-t border-warm-200 bg-white p-3">
+              <div className="flex min-h-12 items-center rounded-xl border border-warm-200 bg-white px-3 pr-12 text-left text-[10px] font-semibold text-warm-700 shadow-sm">
+                Sign in to start chatting with your notes
+              </div>
+              <span className="absolute bottom-4 right-4 flex h-8 w-8 items-center justify-center rounded-lg bg-primary/20 text-white blur-[1px]">
+                <ArrowUp className="h-4 w-4" />
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function Hero() {
   return (
@@ -43,107 +166,16 @@ export function Hero() {
             </Link>
           </div>
 
-          <div className="animate-fade-in stagger-4 border-white/12 mt-10 grid max-w-lg grid-cols-3 gap-4 border-t pt-6 opacity-0">
-            {[
-              ['PDF + DOCX', 'Sources'],
-              ['Grounded', 'Answers'],
-              ['One click', 'Flashcards'],
-            ].map(([value, label]) => (
-              <div key={label}>
-                <div className="text-sm font-semibold text-white">{value}</div>
-                <div className="text-white/42 mt-1 text-xs uppercase tracking-[0.16em]">
-                  {label}
-                </div>
-              </div>
-            ))}
+          <div className="animate-fade-in stagger-4 border-white/12 text-white/52 mt-10 flex max-w-lg items-start gap-3 border-t pt-6 text-sm leading-relaxed opacity-0">
+            <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-emerald-300" />
+            Everything stays tied to the material you upload, from the first question to the final
+            review.
           </div>
         </div>
 
         <div className="animate-scale-in stagger-2 relative mx-auto w-full max-w-3xl opacity-0 lg:ml-auto">
           <div className="absolute -inset-8 rounded-full bg-violet-500/10 blur-3xl" />
-          <div className="relative overflow-hidden rounded-[1.75rem] border border-white/15 bg-[#f8f7ff] p-2 shadow-[0_48px_120px_-36px_rgba(0,0,0,.75)]">
-            <div className="flex min-h-[34rem] overflow-hidden rounded-[1.3rem] bg-white text-warm-900">
-              <aside className="hidden w-44 shrink-0 flex-col bg-warm-900 p-4 text-white sm:flex">
-                <div className="flex items-center gap-2 text-sm font-semibold">
-                  <span className="h-7 w-7 rounded-lg bg-primary" /> Studium
-                </div>
-                <div className="mt-9 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">
-                  Library
-                </div>
-                <div className="mt-3 rounded-xl bg-white/10 px-3 py-2.5 text-xs font-medium text-white">
-                  Cognitive science
-                </div>
-                <div className="mt-2 px-3 py-2 text-xs text-white/50">Statistics II</div>
-                <div className="mt-auto rounded-xl border border-white/10 p-3 text-xs leading-relaxed text-white/55">
-                  3 sources ready
-                  <br />
-                  <span className="text-emerald-300">All indexed</span>
-                </div>
-              </aside>
-
-              <div className="flex min-w-0 flex-1 flex-col">
-                <div className="flex items-center justify-between border-b border-warm-200 px-5 py-4">
-                  <div>
-                    <div className="text-xs font-medium text-warm-400">Workspace</div>
-                    <div className="font-display font-semibold">Cognitive science</div>
-                  </div>
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-primary">
-                    <Layers3 className="h-4 w-4" />
-                  </div>
-                </div>
-
-                <div className="grid flex-1 lg:grid-cols-[1fr_13rem]">
-                  <div className="flex min-w-0 flex-col p-5">
-                    <div className="mb-5 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-warm-400">
-                      <MessageCircle className="h-4 w-4 text-primary" /> Ask your sources
-                    </div>
-                    <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-4 py-3 text-sm leading-relaxed text-white">
-                      Why does retrieval practice beat rereading?
-                    </div>
-                    <div className="mt-3 max-w-[92%] rounded-2xl rounded-bl-sm border border-warm-200 bg-warm-50 px-4 py-3 text-sm leading-relaxed text-warm-700">
-                      Your lecture notes explain that retrieval strengthens the path to a memory.
-                      Rereading can feel fluent without proving that you can recall the idea
-                      independently.
-                    </div>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <span className="rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-primary">
-                        Give me an example
-                      </span>
-                      <span className="rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-primary">
-                        Make 5 cards
-                      </span>
-                    </div>
-                    <div className="mt-auto flex items-center gap-2 rounded-2xl border border-warm-200 bg-white p-2 shadow-[0_12px_40px_-24px_rgba(45,39,110,.45)]">
-                      <span className="flex-1 px-2 text-sm text-warm-400">Ask a follow-up...</span>
-                      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-warm-900 text-white">
-                        <ArrowUp className="h-4 w-4" />
-                      </span>
-                    </div>
-                  </div>
-
-                  <aside className="hidden border-l border-warm-200 bg-warm-50 p-4 lg:block">
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-warm-400">
-                      Sources
-                    </div>
-                    {['lecture-06.pdf', 'memory-notes.docx', 'study-guide.pdf'].map(
-                      (file, index) => (
-                        <div
-                          key={file}
-                          className="mt-3 rounded-xl border border-warm-200 bg-white p-3"
-                        >
-                          <FileText className="h-4 w-4 text-primary" />
-                          <div className="mt-2 truncate text-xs font-semibold">{file}</div>
-                          <div className="mt-1 text-[10px] text-warm-400">
-                            {index + 8} pages indexed
-                          </div>
-                        </div>
-                      )
-                    )}
-                  </aside>
-                </div>
-              </div>
-            </div>
-          </div>
+          <HeroProductPreview />
         </div>
       </div>
     </section>
