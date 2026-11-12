@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Lexend, Source_Sans_3 } from 'next/font/google';
+import { MotionProvider } from '@/components/motion-provider';
 import './globals.css';
 
 const lexend = Lexend({
@@ -57,11 +58,11 @@ export default function RootLayout({
       <body className={`${sourceSans.variable} ${lexend.variable} font-sans antialiased`}>
         <a
           href="#main-content"
-          className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-lg bg-warm-900 px-4 py-3 font-semibold text-white shadow-xl transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-lg bg-warm-900 px-4 py-3 font-semibold text-white shadow-overlay transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
         >
           Skip to main content
         </a>
-        {children}
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );

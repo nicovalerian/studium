@@ -6,6 +6,10 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
 }
 
 @layer base {
@@ -16,8 +20,8 @@
     --card: 0 0% 100%;
     --card-foreground: 238 33% 13%;
 
-    --popover: 220 25% 98%;
-    --popover-foreground: 224 35% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 238 33% 13%;
 
     --primary: 248 74% 58%;
     --primary-foreground: 0 0% 100%;
@@ -31,8 +35,9 @@
     --accent: 158 66% 39%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 65% 55%;
-    --destructive-foreground: 210 40% 98%;
+    /* Lightness 55% -> 47%: white text and red-on-white text now clear 4.5:1. */
+    --destructive: 0 65% 47%;
+    --destructive-foreground: 0 0% 100%;
 
     --border: 244 20% 88%;
     --input: 244 20% 84%;
@@ -44,14 +49,19 @@
     --chart-4: 260 40% 55%;
     --chart-5: 280 40% 55%;
 
-    --radius: 0.85rem;
+    /* One radius scale: lg/xl = controls and list items, 2xl = panels, full = badges. */
+    --radius: 0.75rem;
+
+    /* Motion vocabulary: one exponential ease-out for every transition. */
+    --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 
     /* Re-mapped Warm Scale to Cool Slate/Indigo Scale */
     --warm-50: 248 33% 98%;
     --warm-100: 246 28% 95%;
     --warm-200: 244 20% 88%;
     --warm-300: 242 16% 78%;
-    --warm-400: 240 12% 61%;
+    /* Lightness 61% -> 46%: muted text and placeholders clear 4.5:1 on warm-50/100. */
+    --warm-400: 240 12% 46%;
     --warm-500: 238 12% 43%;
     --warm-600: 238 18% 32%;
     --warm-700: 240 25% 24%;
@@ -69,6 +79,7 @@
 
     --sand: 200 20% 55%; /* Slate Blue/Grey */
     --sand-light: 200 20% 92%;
+    --sand-dark: 200 30% 32%;
   }
 }
 
@@ -77,12 +88,18 @@
     @apply border-border;
   }
 
+  html {
+    scroll-padding-top: 1.5rem;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings:
       'rlig' 1,
       'calt' 1;
     min-width: 320px;
+    caret-color: hsl(var(--primary));
+    accent-color: hsl(var(--primary));
   }
 
   h1,
@@ -91,78 +108,32 @@
   h4,
   h5,
   h6 {
-    @apply font-display font-semibold tracking-tight text-[hsl(var(--warm-800))];
+    @apply text-balance font-display font-semibold tracking-tight text-[hsl(var(--warm-800))];
+  }
+
+  /* Fallback focus ring for anything that does not draw its own. */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  kbd {
+    @apply inline-flex h-5 min-w-5 items-center justify-center rounded-md border border-warm-200 bg-white px-1.5 font-sans text-[11px] font-semibold text-warm-600 shadow-[0_1px_0_hsl(var(--warm-200))];
   }
 }
 
 @layer components {
-  .btn-warm {
-    @apply rounded-lg bg-[hsl(var(--terracotta))] px-6 py-3 font-medium text-white transition-all duration-200 ease-out hover:bg-[hsl(var(--terracotta-dark))] hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
-  }
-
-  .btn-warm-outline {
-    @apply rounded-lg border-2 border-[hsl(var(--terracotta))] bg-transparent px-6 py-3 font-medium text-[hsl(var(--terracotta))] transition-all duration-200 ease-out hover:bg-[hsl(var(--terracotta-light))] active:scale-[0.98];
-  }
-
-  .btn-soft {
-    @apply rounded-lg bg-[hsl(var(--warm-200))] px-6 py-3 font-medium text-[hsl(var(--warm-700))] transition-all duration-200 ease-out hover:bg-[hsl(var(--warm-300))] active:scale-[0.98];
-  }
-
-  .card-warm {
-    @apply rounded-xl border border-[hsl(var(--warm-200))] bg-[hsl(var(--card))] p-6 shadow-sm transition-all duration-200;
-  }
-
-  .card-warm-hover {
-    @apply card-warm hover:-translate-y-0.5 hover:shadow-md;
-  }
-
-  .card-paper {
-    @apply rounded-xl border border-[hsl(var(--warm-200))] bg-gradient-to-br from-[hsl(var(--card))] to-[hsl(var(--warm-100))] p-6 shadow-sm;
-  }
-
-  .input-warm {
-    @apply rounded-lg border border-[hsl(var(--warm-300))] bg-[hsl(var(--warm-50))] px-4 py-3 text-[hsl(var(--warm-800))] transition-all duration-200 placeholder:text-[hsl(var(--warm-400))] focus:border-[hsl(var(--terracotta))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--terracotta)/0.15)];
-  }
-
-  .badge-warm {
-    @apply inline-flex items-center rounded-full bg-[hsl(var(--terracotta-light))] px-3 py-1 text-sm font-medium text-[hsl(var(--terracotta-dark))];
-  }
-
-  .badge-sage {
-    @apply inline-flex items-center rounded-full bg-[hsl(var(--sage-light))] px-3 py-1 text-sm font-medium text-[hsl(var(--sage-dark))];
-  }
-
-  .section-warm {
-    @apply bg-gradient-to-b from-[hsl(var(--warm-50))] via-[hsl(var(--warm-100))] to-[hsl(var(--warm-50))];
-  }
-
-  .text-gradient-warm {
-    @apply bg-gradient-to-r from-[hsl(var(--terracotta))] to-[hsl(var(--sage))] bg-clip-text text-transparent;
-  }
-
-  .app-grid {
-    background-image:
-      linear-gradient(hsl(var(--warm-200) / 0.28) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(var(--warm-200) / 0.28) 1px, transparent 1px);
-    background-size: 48px 48px;
-  }
-
-  .surface-panel {
-    @apply border border-white/70 bg-white/85 shadow-[0_24px_80px_-42px_rgba(28,25,72,0.28)] backdrop-blur-xl;
-  }
-
   .reveal-on-scroll {
     opacity: 0;
-    transform: translateY(24px) scale(0.985);
+    transform: translateY(16px);
     transition:
-      opacity 0.7s ease,
-      transform 0.7s ease;
-    will-change: opacity, transform;
+      opacity 0.6s var(--ease-out-quint),
+      transform 0.6s var(--ease-out-quint);
   }
 
   .reveal-on-scroll.is-visible {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: none;
   }
 
   @keyframes fade-in {
@@ -179,7 +150,7 @@
   @keyframes scale-in {
     from {
       opacity: 0;
-      transform: scale(0.95);
+      transform: scale(0.97);
     }
     to {
       opacity: 1;
@@ -187,40 +158,38 @@
     }
   }
 
-  @keyframes slide-up {
-    from {
-      opacity: 0;
-      transform: translateY(16px);
-    }
-    to {
-      opacity: 1;
+  /* Typing dots, from prompt-kit's TypingLoader (MIT). */
+  @keyframes typing {
+    0%,
+    100% {
       transform: translateY(0);
+      opacity: 0.5;
+    }
+    50% {
+      transform: translateY(-2px);
+      opacity: 1;
     }
   }
 
   .animate-fade-in {
-    animation: fade-in 0.4s ease-out forwards;
+    animation: fade-in 0.6s var(--ease-out-quint) forwards;
   }
 
   .animate-scale-in {
-    animation: scale-in 0.3s ease-out forwards;
-  }
-
-  .animate-slide-up {
-    animation: slide-up 0.5s ease-out forwards;
+    animation: scale-in 0.7s var(--ease-out-quint) forwards;
   }
 
   .stagger-1 {
-    animation-delay: 0.1s;
+    animation-delay: 0.08s;
   }
   .stagger-2 {
-    animation-delay: 0.2s;
+    animation-delay: 0.16s;
   }
   .stagger-3 {
-    animation-delay: 0.3s;
+    animation-delay: 0.24s;
   }
   .stagger-4 {
-    animation-delay: 0.4s;
+    animation-delay: 0.32s;
   }
 }
 
@@ -248,20 +217,22 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--warm-100));
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: hsl(var(--warm-300));
-  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--warm-400));
+  background-clip: padding-box;
 }
 
 ::selection {
-  background: hsl(var(--primary) / 0.15);
+  background: hsl(var(--primary) / 0.18);
   color: hsl(var(--warm-900));
 }

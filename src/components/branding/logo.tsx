@@ -19,7 +19,7 @@ const sizeStyles = {
     lineOne: 'left-2.5 right-2.5 top-[18px] h-1.5',
     lineTwo: 'left-2.5 right-4 top-[24px] h-1.5',
     title: 'text-lg',
-    subtitle: 'text-[10px]',
+    subtitle: 'text-[11px]',
   },
   md: {
     wrapper: 'gap-3',
@@ -60,7 +60,7 @@ const themeStyles = {
   },
   inverse: {
     title: 'text-white',
-    subtitle: 'text-white/70',
+    subtitle: 'text-white/75',
     ring: 'ring-white/10',
   },
 } satisfies Record<LogoTheme, { title: string; subtitle: string; ring: string }>;
@@ -70,7 +70,7 @@ export function Logo({
   theme = 'default',
   className,
   showTagline = false,
-  tagline = 'Study in flow',
+  tagline = 'Study from source',
 }: LogoProps) {
   const sizeStyle = sizeStyles[size];
   const themeStyle = themeStyles[theme];
@@ -79,32 +79,32 @@ export function Logo({
     <div className={cn('inline-flex items-center', sizeStyle.wrapper, className)}>
       <span
         className={cn(
-          'relative isolate flex shrink-0 overflow-hidden bg-[hsl(var(--warm-900))] shadow-[0_18px_40px_-24px_rgba(15,23,42,0.9)] ring-1',
+          'relative isolate flex shrink-0 overflow-hidden bg-[hsl(var(--warm-900))] shadow-raised ring-1',
           sizeStyle.mark,
           themeStyle.ring
         )}
         aria-hidden="true"
       >
         <span className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.28),_transparent_48%),linear-gradient(135deg,hsl(var(--terracotta)),hsl(var(--warm-900))_65%,hsl(var(--sage-dark)))]" />
-        <span
-          className={cn('absolute rounded-full bg-white/95 shadow-sm', sizeStyle.dot)}
-        />
-        <span
-          className={cn('absolute rounded-full bg-white/90 shadow-sm', sizeStyle.lineOne)}
-        />
-        <span
-          className={cn('absolute rounded-full bg-white/65 shadow-sm', sizeStyle.lineTwo)}
-        />
+        <span className={cn('absolute rounded-full bg-white/95 shadow-sm', sizeStyle.dot)} />
+        <span className={cn('absolute rounded-full bg-white/90 shadow-sm', sizeStyle.lineOne)} />
+        <span className={cn('absolute rounded-full bg-white/65 shadow-sm', sizeStyle.lineTwo)} />
       </span>
 
       <span className="flex flex-col">
-        <span className={cn('font-serif font-semibold leading-none tracking-tight', sizeStyle.title, themeStyle.title)}>
+        <span
+          className={cn(
+            'font-serif font-semibold leading-none tracking-tight',
+            sizeStyle.title,
+            themeStyle.title
+          )}
+        >
           Studium
         </span>
         {showTagline ? (
           <span
             className={cn(
-              'mt-1 font-sans uppercase tracking-[0.26em]',
+              'mt-1 font-sans uppercase tracking-[0.2em]',
               sizeStyle.subtitle,
               themeStyle.subtitle
             )}

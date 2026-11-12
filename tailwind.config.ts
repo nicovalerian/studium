@@ -80,12 +80,29 @@ const config: Config = {
         sand: {
           DEFAULT: 'hsl(var(--sand))',
           light: 'hsl(var(--sand-light))',
+          dark: 'hsl(var(--sand-dark))',
         },
       },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+      // One shadow system: a soft offset shadow per elevation step, tinted from warm-900.
+      boxShadow: {
+        raised:
+          '0 1px 2px hsl(var(--warm-900) / 0.05), 0 4px 12px -6px hsl(var(--warm-900) / 0.12)',
+        panel:
+          '0 1px 2px hsl(var(--warm-900) / 0.04), 0 16px 40px -28px hsl(var(--warm-900) / 0.35)',
+        overlay:
+          '0 2px 6px hsl(var(--warm-900) / 0.06), 0 24px 64px -24px hsl(var(--warm-900) / 0.4)',
+      },
+      transitionTimingFunction: {
+        DEFAULT: 'var(--ease-out-quint)',
+        'out-quint': 'var(--ease-out-quint)',
+      },
+      animation: {
+        typing: 'typing 1s ease-in-out infinite',
       },
     },
   },

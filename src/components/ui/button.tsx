@@ -14,21 +14,23 @@ const buttonVariants = cva(
         destructive:
           'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 hover:shadow-md active:scale-[0.98]',
         outline:
-          'border-2 border-input bg-background shadow-sm hover:bg-secondary hover:border-primary/30',
+          'border border-warm-300 bg-white text-warm-800 shadow-sm hover:border-warm-400/40 hover:bg-secondary active:scale-[0.98]',
         secondary:
           'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 active:scale-[0.98]',
         ghost: 'hover:bg-secondary hover:text-secondary-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
-        warm: 'bg-primary text-primary-foreground shadow-sm hover:bg-[hsl(var(--terracotta-dark))] hover:shadow-md active:scale-[0.98]',
-        'warm-outline':
-          'border-2 border-primary bg-transparent text-primary hover:bg-[hsl(var(--terracotta-light))] active:scale-[0.98]',
-        soft: 'bg-secondary text-secondary-foreground hover:bg-[hsl(var(--warm-300))] active:scale-[0.98]',
+        /** Secondary action on the dark (warm-900) app bars. */
+        inverse:
+          'border border-white/20 bg-white/10 text-white hover:border-white/30 hover:bg-white/15 focus-visible:ring-white focus-visible:ring-offset-warm-900',
+        success:
+          'bg-sage-dark text-white shadow-sm hover:bg-sage-dark/90 hover:shadow-md active:scale-[0.98]',
       },
       size: {
         default: 'h-9 px-4 py-2',
         sm: 'h-8 rounded-lg px-3 text-xs',
-        lg: 'h-10 rounded-lg px-8',
+        lg: 'h-11 rounded-lg px-6',
         icon: 'h-9 w-9',
+        'icon-lg': 'h-11 w-11',
       },
     },
     defaultVariants: {
