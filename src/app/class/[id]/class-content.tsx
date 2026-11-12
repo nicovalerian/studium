@@ -27,6 +27,7 @@ import {
 } from '@/lib/auth/access';
 import { WorkspaceAccessBanner, WorkspaceAccessDialog } from '@/components/auth/access-gate';
 import { DesktopOnlyGate } from '@/components/layout/desktop-only-gate';
+import { AnimatedBackground } from '@/components/ui/animated-background';
 
 interface Document {
   id: string;
@@ -397,9 +398,13 @@ export function ClassContent({
     <DesktopOnlyGate>
       <>
         <div className="flex h-svh min-h-[640px] flex-col bg-warm-100">
-          <header className="relative z-20 flex h-[4.5rem] shrink-0 items-center justify-between border-b border-white/10 bg-warm-900 px-4 text-white shadow-[0_12px_38px_-24px_rgba(20,16,60,.8)] sm:px-6">
+          <header className="relative z-20 flex h-16 shrink-0 items-center justify-between border-b border-white/10 bg-warm-900 px-4 text-white sm:px-6">
             <div className="flex items-center gap-3">
-              <Link href="/" aria-label="Back to Studium home">
+              <Link
+                href="/"
+                aria-label="Back to Studium home"
+                className="rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-warm-900"
+              >
                 <Logo size="sm" theme="inverse" showTagline tagline="Study from source" />
               </Link>
             </div>
@@ -415,22 +420,24 @@ export function ClassContent({
                 >
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="inverse"
                     size="sm"
-                    className="h-9 whitespace-nowrap border-white/15 bg-white/10 text-white hover:border-white/25 hover:bg-white/15"
+                    className="h-9 whitespace-nowrap"
                     onClick={handleSignOut}
+                    tabIndex={isProfileMenuOpen ? 0 : -1}
                   >
-                    <LogOut className="mr-1.5 h-4 w-4" />
+                    <LogOut />
                     Sign out
                   </Button>
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-                  title="Profile"
+                  title={user.email ?? 'Profile'}
                   aria-label="Open profile actions"
                   aria-expanded={isProfileMenuOpen}
-                  className="relative h-11 w-11 cursor-pointer overflow-hidden rounded-full border-2 border-white/15 bg-white/10 ring-offset-warm-900 transition-all duration-200 hover:border-violet-300 hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-violet-300 focus:ring-offset-2"
+                  className="relative h-10 w-10 cursor-pointer overflow-hidden rounded-full border border-white/20 bg-white/10 transition-colors duration-200 hover:border-white/40 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-warm-900"
                 >
                   {user.user_metadata?.avatar_url ? (
                     <Image
@@ -451,14 +458,18 @@ export function ClassContent({
               <div className="flex items-center gap-2">
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="inverse"
                   size="sm"
-                  className="border-white/15 bg-white/10 text-white hover:bg-white/15"
                   onClick={() => router.push(loginHref)}
                 >
                   Sign in
                 </Button>
-                <Button type="button" size="sm" onClick={() => router.push(signupHref)}>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="focus-visible:ring-white focus-visible:ring-offset-warm-900"
+                  onClick={() => router.push(signupHref)}
+                >
                   Create account
                 </Button>
               </div>
@@ -476,38 +487,47 @@ export function ClassContent({
           ) : null}
 
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row lg:gap-3 lg:p-3">
-            <aside className="relative z-10 flex h-[42%] min-h-[260px] w-full shrink-0 flex-col border-b border-border bg-card lg:h-auto lg:min-h-0 lg:w-[22rem] lg:rounded-2xl lg:border lg:shadow-[0_18px_55px_-38px_rgba(35,29,92,.38)]">
-              <div className="grid grid-cols-2 gap-1.5 border-b border-border bg-warm-50 p-2 lg:rounded-t-2xl">
-                <button
-                  onClick={() => setActiveTab('documents')}
-                  className={`flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition-all duration-200 ${
-                    activeTab === 'documents'
-                      ? 'bg-white text-primary shadow-sm ring-1 ring-border'
-                      : 'text-muted-foreground hover:bg-white/65 hover:text-foreground'
-                  }`}
+            <aside className="relative z-10 flex h-[42%] min-h-[260px] w-full shrink-0 flex-col border-b border-border bg-card lg:h-auto lg:min-h-0 lg:w-[22rem] lg:rounded-2xl lg:border lg:shadow-panel">
+              <div
+                role="tablist"
+                aria-label="Workspace panels"
+                className="grid grid-cols-2 gap-1 border-b border-border bg-warm-50 p-1.5 lg:rounded-t-2xl"
+              >
+                <AnimatedBackground
+                  value={activeTab}
+                  onValueChange={(value) => setActiveTab(value as 'documents' | 'flashcards')}
+                  className="rounded-lg bg-white shadow-raised ring-1 ring-border"
                 >
-                  <FileText className="h-4 w-4" />
-                  Documents
-                </button>
-                <button
-                  onClick={() => setActiveTab('flashcards')}
-                  className={`flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition-all duration-200 ${
-                    activeTab === 'flashcards'
-                      ? 'bg-white text-primary shadow-sm ring-1 ring-border'
-                      : 'text-muted-foreground hover:bg-white/65 hover:text-foreground'
-                  }`}
-                >
-                  <Layers className="h-4 w-4" />
-                  Flashcards
-                  {flashcards.length > 0 ? (
-                    <span className="rounded-full bg-secondary px-1.5 py-0.5 text-xs text-secondary-foreground">
-                      {flashcards.length}
-                    </span>
-                  ) : null}
-                </button>
+                  {[
+                    { id: 'documents', label: 'Documents', icon: FileText },
+                    { id: 'flashcards', label: 'Flashcards', icon: Layers },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      data-id={tab.id}
+                      id={`workspace-tab-${tab.id}`}
+                      aria-controls="workspace-panel"
+                      type="button"
+                      className="flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold text-muted-foreground transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[state=active]:text-primary"
+                    >
+                      <tab.icon className="h-4 w-4" aria-hidden="true" />
+                      {tab.label}
+                      {tab.id === 'flashcards' && flashcards.length > 0 ? (
+                        <span className="rounded-full bg-secondary px-1.5 py-0.5 text-xs tabular-nums text-secondary-foreground">
+                          {flashcards.length}
+                        </span>
+                      ) : null}
+                    </button>
+                  ))}
+                </AnimatedBackground>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 lg:p-5">
+              <div
+                id="workspace-panel"
+                role="tabpanel"
+                aria-labelledby={`workspace-tab-${activeTab}`}
+                className="flex-1 overflow-y-auto p-4 lg:p-5"
+              >
                 {activeTab === 'documents' ? (
                   <div className="space-y-4">
                     <FileUpload
@@ -520,7 +540,6 @@ export function ClassContent({
                       documents={documents}
                       onDocumentsDeleted={() => void refreshDocuments()}
                       isReadOnly={isReadOnly}
-                      blurEmptyState={workspaceState === 'guest'}
                     />
                   </div>
                 ) : (
@@ -538,18 +557,16 @@ export function ClassContent({
 
             <main
               id="main-content"
-              className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white lg:rounded-2xl lg:border lg:border-border lg:shadow-[0_18px_55px_-38px_rgba(35,29,92,.38)]"
+              className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white lg:rounded-2xl lg:border lg:border-border lg:shadow-panel"
               tabIndex={-1}
             >
               <div className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-white px-4 sm:px-5 lg:rounded-t-2xl">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary text-primary">
-                    <MessageCircle className="h-4 w-4" />
-                  </span>
+                <div className="flex items-center gap-2.5">
+                  <MessageCircle className="h-5 w-5 text-primary" aria-hidden="true" />
                   <div>
-                    <span className="block text-sm font-semibold text-foreground">
+                    <h1 className="font-sans text-sm font-semibold tracking-normal text-foreground">
                       Study assistant
-                    </span>
+                    </h1>
                     <span className="hidden text-xs text-muted-foreground sm:block">
                       Answers grounded in your uploaded materials
                     </span>
@@ -559,21 +576,21 @@ export function ClassContent({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="h-8 gap-1.5 px-2 text-xs"
+                  className="h-9 gap-1.5 px-2.5 text-xs text-warm-600"
                   onClick={handleClearChat}
                   disabled={
                     workspaceEnabled ? isLoading || isClearingChat || messages.length === 0 : false
                   }
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
-                  {isClearingChat ? 'Clearing...' : 'Clear chat'}
+                  <Trash2 aria-hidden="true" />
+                  {isClearingChat ? 'Clearing…' : 'Clear chat'}
                 </Button>
               </div>
 
-              <div className="app-grid flex flex-1 flex-col overflow-hidden bg-warm-50">
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-warm-50">
                 <ChatContainer messages={messages} isLoading={isLoading} />
 
-                <div className="shrink-0 border-t border-border bg-white/90 p-3 backdrop-blur sm:p-4">
+                <div className="shrink-0 border-t border-border bg-white p-3 sm:p-4">
                   {rateLimit ? (
                     <RateLimitTimer
                       retryAfter={rateLimit.retryAfter}
@@ -587,12 +604,12 @@ export function ClassContent({
                       onBlockedAction={() => openBlockedPrompt('chat')}
                       placeholder={
                         workspaceState === 'guest'
-                          ? 'Sign in to ask about your notes...'
+                          ? 'Sign in to ask about your notes…'
                           : workspaceState === 'unverified'
-                            ? 'Verify your email to unlock chat...'
+                            ? 'Verify your email to unlock chat…'
                             : documents.length === 0
-                              ? 'Upload documents to start chatting...'
-                              : 'Ask something about your notes...'
+                              ? 'Upload documents to start chatting…'
+                              : 'Ask something about your notes…'
                       }
                     />
                   )}

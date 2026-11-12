@@ -2,11 +2,12 @@
 
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileText, Loader2 } from 'lucide-react';
+import { Upload, FileText, Loader2, Lock } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '@/lib/file-processing';
 import type { WorkspaceAccessState } from '@/lib/auth/access';
+import { cn } from '@/lib/utils';
 
 interface FileUploadProps {
   classId: string | null;
@@ -125,61 +126,69 @@ export function FileUpload({
     noKeyboard: isBlocked,
   });
 
-  return (
-    <div className="space-y-4">
-      <div className="relative">
-        <div
-          {...getRootProps()}
-          className={`cursor-pointer rounded-2xl border border-dashed p-5 text-center transition-all duration-200 lg:p-6 ${
-            isDragActive
-              ? 'border-primary bg-[hsl(var(--terracotta-light))]'
-              : 'border-[hsl(var(--warm-300))] bg-warm-50 hover:border-primary/60 hover:bg-secondary/70'
-          } ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
+  if (isBlocked) {
+    // The dropzone stays mounted (click and keyboard disabled) so a dropped file still opens
+    // the sign-in prompt instead of the browser navigating to it.
+    return (
+      <div {...getRootProps({ className: 'rounded-xl' })}>
+        <input {...getInputProps()} tabIndex={-1} aria-hidden="true" />
+        <button
+          type="button"
+          onClick={onBlockedAction}
+          className="group flex w-full flex-col items-center gap-2 rounded-xl border border-dashed border-warm-300 bg-warm-50 p-5 text-center transition-colors duration-200 hover:border-primary/50 hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:p-6"
         >
-          <input {...getInputProps()} />
-          <div className="flex flex-col items-center gap-2">
-            {isUploading ? (
-              <Loader2 className="h-10 w-10 animate-spin text-[hsl(var(--warm-400))]" />
-            ) : isDragActive ? (
-              <FileText className="h-10 w-10 text-primary" />
-            ) : (
-              <Upload className="h-10 w-10 text-[hsl(var(--warm-400))]" />
-            )}
-            <div>
-              {isDragActive ? (
-                <p className="font-medium text-primary">Drop the file here</p>
-              ) : (
-                <>
-                  <p className="font-medium text-[hsl(var(--warm-700))]">Drag & drop a file here</p>
-                  <p className="text-sm text-[hsl(var(--warm-500))]">or click to browse</p>
-                </>
-              )}
-            </div>
-            <p className="text-xs text-[hsl(var(--warm-400))]">PDF or DOCX, max 10MB</p>
-          </div>
-        </div>
+          <Lock
+            className="h-6 w-6 text-warm-400 transition-colors group-hover:text-primary"
+            aria-hidden="true"
+          />
+          <span className="font-semibold text-warm-800">
+            {workspaceState === 'guest' ? 'Sign in to upload' : 'Verify your email to upload'}
+          </span>
+          <span className="text-xs text-warm-500">PDF or DOCX, max 10MB</span>
+        </button>
+      </div>
+    );
+  }
 
-        {isBlocked ? (
-          <button
-            type="button"
-            onClick={onBlockedAction}
-            className="absolute inset-0 z-10 rounded-xl bg-white/70 backdrop-blur-[2px]"
-          >
-            <span className="sr-only">Unlock uploads</span>
-          </button>
-        ) : null}
+  return (
+    <div className="space-y-3">
+      <div
+        {...getRootProps()}
+        className={cn(
+          'cursor-pointer rounded-xl border border-dashed p-5 text-center transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:p-6',
+          isDragActive
+            ? 'border-primary bg-terracotta-light'
+            : 'border-warm-300 bg-warm-50 hover:border-primary/50 hover:bg-secondary/60',
+          isUploading && 'pointer-events-none'
+        )}
+      >
+        <input {...getInputProps()} aria-label="Upload a PDF or DOCX file" />
+        <div className="flex flex-col items-center gap-2">
+          {isUploading ? (
+            <Loader2 className="h-7 w-7 animate-spin text-primary" aria-hidden="true" />
+          ) : isDragActive ? (
+            <FileText className="h-7 w-7 text-primary" aria-hidden="true" />
+          ) : (
+            <Upload className="h-7 w-7 text-warm-400" aria-hidden="true" />
+          )}
+          <div>
+            {isUploading ? (
+              <p className="font-semibold text-warm-800">Uploading…</p>
+            ) : isDragActive ? (
+              <p className="font-semibold text-primary">Drop the file here</p>
+            ) : (
+              <>
+                <p className="font-semibold text-warm-800">Drag & drop a file here</p>
+                <p className="text-sm text-warm-500">or click to browse</p>
+              </>
+            )}
+          </div>
+          <p className="text-xs text-warm-500">PDF or DOCX, max 10MB</p>
+        </div>
       </div>
 
-      {isBlocked ? (
-        <p className="text-center text-xs text-[hsl(var(--warm-500))]">
-          {workspaceState === 'guest'
-            ? 'Sign in to upload PDFs or DOCX files.'
-            : 'Verify your email to upload study materials.'}
-        </p>
-      ) : null}
-
       {isUploading && (
-        <Progress value={progress} className="h-2 bg-[hsl(var(--warm-200))] [&>*]:bg-primary" />
+        <Progress value={progress} aria-label="Upload progress" className="h-1.5 bg-warm-200" />
       )}
     </div>
   );

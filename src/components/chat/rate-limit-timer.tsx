@@ -28,15 +28,22 @@ export function RateLimitTimer({ retryAfter, onComplete }: RateLimitTimerProps) 
   const progress = ((retryAfter - timeLeft) / retryAfter) * 100;
 
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
-      <div className="flex items-center gap-2 font-medium">
-        <Clock className="h-4 w-4" />
+    <div
+      role="status"
+      className="mx-auto flex max-w-3xl flex-col gap-2 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900"
+    >
+      <div className="flex items-center gap-2 font-semibold">
+        <Clock className="h-4 w-4" aria-hidden="true" />
         <span>Rate limit reached</span>
       </div>
-      <p className="text-sm opacity-90">
+      <p className="text-sm tabular-nums">
         Please wait {timeLeft} seconds before sending another message.
       </p>
-      <Progress value={progress} className="h-1 bg-amber-200 dark:bg-amber-900" />
+      <Progress
+        value={progress}
+        aria-label="Time until you can send again"
+        className="h-1 bg-amber-200 [&>*]:bg-amber-600"
+      />
     </div>
   );
 }

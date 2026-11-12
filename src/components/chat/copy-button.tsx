@@ -25,14 +25,19 @@ export function CopyButton({ content, className }: CopyButtonProps) {
 
   return (
     <Button
+      type="button"
       variant="ghost"
-      size="icon"
-      className={cn('h-6 w-6 text-muted-foreground hover:text-foreground', className)}
+      size="sm"
+      className={cn('h-7 gap-1.5 px-2 text-xs text-warm-500 hover:text-warm-800', className)}
       onClick={copyToClipboard}
-      title="Copy to clipboard"
+      aria-label={isCopied ? 'Copied to clipboard' : 'Copy message'}
     >
-      {isCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-      <span className="sr-only">Copy message</span>
+      {isCopied ? (
+        <Check className="text-sage-dark" aria-hidden="true" />
+      ) : (
+        <Copy aria-hidden="true" />
+      )}
+      <span aria-live="polite">{isCopied ? 'Copied' : 'Copy'}</span>
     </Button>
   );
 }
