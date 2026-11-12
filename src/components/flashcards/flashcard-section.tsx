@@ -1,12 +1,13 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Link from 'next/link';
+import { Layers, Play } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { easeOut } from '@/lib/motion';
+import type { WorkspaceAccessState } from '@/lib/auth/access';
 import { GenerateButton } from './generate-button';
 import { FlashcardItem, Flashcard } from './flashcard-item';
-import { Layers, Play } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import type { WorkspaceAccessState } from '@/lib/auth/access';
 
 interface FlashcardSectionProps {
   classId: string | null;
@@ -40,70 +41,71 @@ export function FlashcardSection({
   };
 
   return (
-    <Card className="flex h-full flex-col overflow-hidden">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Layers className="h-5 w-5 text-[hsl(var(--sage))]" />
-          Flashcards
-          <div className="ml-auto flex items-center gap-2">
-            <span className="rounded-full bg-[hsl(var(--warm-200))] px-2 py-1 text-xs font-normal text-[hsl(var(--warm-600))]">
-              {flashcards.length}
-            </span>
-            {flashcards.length > 0 && (
-              <Button
-                asChild
-                size="sm"
-                className="h-7 rounded-full bg-[hsl(var(--sage))] hover:bg-[hsl(var(--sage-dark))]"
-              >
-                <Link href={classId ? `/class/${classId}/flashcards` : '/dashboard'}>
-                  <Play className="mr-1 h-3 w-3" /> Study
-                </Link>
-              </Button>
-            )}
+    <div className="flex h-full flex-col gap-4">
+      <div className="flex min-h-9 items-center justify-between gap-3">
+        <p className="text-sm text-warm-600">
+          <span className="font-semibold tabular-nums text-warm-900">{flashcards.length}</span>{' '}
+          {flashcards.length === 1 ? 'card' : 'cards'}
+        </p>
+        {flashcards.length > 0 && (
+          <Button asChild size="sm" variant="success" className="h-9 px-3.5">
+            <Link href={classId ? `/class/${classId}/flashcards` : '/dashboard'}>
+              <Play aria-hidden="true" /> Study
+            </Link>
+          </Button>
+        )}
+      </div>
+
+      <GenerateButton
+        classId={classId}
+        onGenerateComplete={handleGenerateComplete}
+        disabled={!hasDocuments}
+        workspaceState={workspaceState}
+        onBlockedAction={onBlockedAction}
+      />
+
+      {isReadOnly && flashcards.length > 0 ? (
+        <p className="text-center text-xs text-warm-500">
+          Flashcards stay read-only until{' '}
+          {workspaceState === 'guest' ? 'you sign in' : 'your email is verified'}.
+        </p>
+      ) : null}
+
+      <div className="flex-1">
+        {flashcards.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-xl bg-warm-50 px-4 py-8 text-center">
+            <Layers className="mb-3 h-7 w-7 text-warm-300" aria-hidden="true" />
+            <p className="text-sm font-semibold text-warm-700">No flashcards yet</p>
+            <p className="mt-1 max-w-[15rem] text-sm text-warm-500">
+              {hasDocuments
+                ? 'Click generate to create flashcards from your documents.'
+                : 'Upload documents first to generate flashcards.'}
+            </p>
           </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-1 flex-col gap-4 overflow-hidden">
-        <GenerateButton
-          classId={classId}
-          onGenerateComplete={handleGenerateComplete}
-          disabled={!hasDocuments}
-          workspaceState={workspaceState}
-          onBlockedAction={onBlockedAction}
-        />
-
-        {isReadOnly && flashcards.length > 0 ? (
-          <p className="text-center text-xs text-[hsl(var(--warm-500))]">
-            Flashcards stay read-only until {workspaceState === 'guest' ? 'you sign in' : 'your email is verified'}.
-          </p>
-        ) : null}
-
-        <div className="-mr-2 flex-1 overflow-y-auto pr-2">
-          {flashcards.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-[hsl(var(--warm-200))] bg-[hsl(var(--warm-100))] p-4 text-center text-[hsl(var(--warm-500))]">
-              <Layers className="mb-2 h-8 w-8 text-[hsl(var(--warm-300))]" />
-              <p className="text-sm font-medium text-[hsl(var(--warm-600))]">No flashcards yet</p>
-              <p className="mt-1 max-w-[180px] text-xs">
-                {hasDocuments
-                  ? 'Click generate to create flashcards from your documents.'
-                  : 'Upload documents first to generate flashcards.'}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4 pb-4">
+        ) : (
+          <ul className="space-y-3 pb-2">
+            <AnimatePresence initial={false}>
               {flashcards.map((flashcard) => (
-                <FlashcardItem
+                <motion.li
                   key={flashcard.id}
-                  flashcard={flashcard}
-                  onUpdate={handleUpdate}
-                  onDelete={handleDelete}
-                  isReadOnly={isReadOnly}
-                />
+                  layout="position"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, transition: { duration: 0.15 } }}
+                  transition={easeOut}
+                >
+                  <FlashcardItem
+                    flashcard={flashcard}
+                    onUpdate={handleUpdate}
+                    onDelete={handleDelete}
+                    isReadOnly={isReadOnly}
+                  />
+                </motion.li>
               ))}
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            </AnimatePresence>
+          </ul>
+        )}
+      </div>
+    </div>
   );
 }

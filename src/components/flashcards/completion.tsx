@@ -1,8 +1,10 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { CheckCircle2, RotateCcw, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { ArrowLeft, CheckCircle2, RotateCcw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { easeOut, spring } from '@/lib/motion';
 
 interface CompletionScreenProps {
   totalReviewed: number;
@@ -12,40 +14,42 @@ interface CompletionScreenProps {
 
 export function CompletionScreen({ totalReviewed, onRestart, classId }: CompletionScreenProps) {
   return (
-    <div className="flex min-h-[500px] w-full flex-col items-center justify-center p-8 text-center duration-500 animate-in fade-in zoom-in">
-      <div className="mb-6 rounded-full bg-[hsl(var(--sage-light))] p-6">
-        <CheckCircle2 className="h-16 w-16 text-[hsl(var(--sage))]" />
-      </div>
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={easeOut}
+      className="flex min-h-[500px] w-full flex-col items-center justify-center p-8 text-center"
+      role="status"
+    >
+      <motion.div
+        initial={{ scale: 0.6, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ ...spring, delay: 0.08 }}
+        className="mb-6"
+      >
+        <CheckCircle2 className="h-14 w-14 text-sage-dark" strokeWidth={1.75} aria-hidden="true" />
+      </motion.div>
 
-      <h2 className="mb-2 text-3xl font-bold text-[hsl(var(--warm-800))]">Review Complete!</h2>
-      <p className="mb-8 text-lg text-[hsl(var(--warm-500))]">
-        You&apos;ve reviewed all{' '}
-        <span className="font-semibold text-[hsl(var(--warm-700))]">{totalReviewed}</span>{' '}
+      <h2 className="mb-2 text-3xl font-semibold text-warm-900">Review complete</h2>
+      <p className="mb-8 text-lg text-warm-500">
+        You reviewed all{' '}
+        <span className="font-semibold tabular-nums text-warm-800">{totalReviewed}</span>{' '}
         flashcards.
       </p>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Button
-          onClick={onRestart}
-          size="lg"
-          className="min-w-[160px] rounded-full bg-primary hover:bg-[hsl(var(--terracotta-dark))]"
-        >
-          <RotateCcw className="mr-2 h-4 w-4" />
-          Review Again
+        <Button type="button" onClick={onRestart} size="lg" className="min-w-[10rem]" autoFocus>
+          <RotateCcw aria-hidden="true" />
+          Review again
         </Button>
 
-        <Button
-          asChild
-          variant="outline"
-          size="lg"
-          className="min-w-[160px] rounded-full border-[hsl(var(--warm-300))]"
-        >
+        <Button asChild variant="outline" size="lg" className="min-w-[10rem]">
           <Link href={`/class/${classId}`}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Class
+            <ArrowLeft aria-hidden="true" />
+            Back to class
           </Link>
         </Button>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -33,12 +33,6 @@ export function FlashcardItem({
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
-  const handleFlip = (e: React.MouseEvent) => {
-    if (isEditing) return;
-    if ((e.target as HTMLElement).closest('button')) return;
-    setIsFlipped(!isFlipped);
-  };
-
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -87,27 +81,35 @@ export function FlashcardItem({
 
   if (isEditing) {
     return (
-      <Card className="mb-4 border-2 border-[hsl(var(--terracotta-light))] shadow-sm">
+      <Card className="border-primary/40">
         <CardContent className="space-y-3 p-4">
           <div>
-            <label className="text-xs font-semibold uppercase text-[hsl(var(--warm-500))]">
-              Front
+            <label
+              htmlFor={`flashcard-${flashcard.id}-front`}
+              className="text-sm font-semibold text-warm-700"
+            >
+              Question
             </label>
             <textarea
+              id={`flashcard-${flashcard.id}-front`}
               value={editFront}
               onChange={(e) => setEditFront(e.target.value)}
-              className="mt-1 flex min-h-[60px] w-full resize-none rounded-lg border border-[hsl(var(--warm-300))] bg-[hsl(var(--warm-50))] px-3 py-2 text-sm text-[hsl(var(--warm-800))] shadow-sm placeholder:text-[hsl(var(--warm-400))] focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--terracotta)/0.15)] disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-1.5 flex min-h-[64px] w-full resize-none rounded-lg border border-warm-300 bg-white px-3 py-2 text-sm text-warm-800 shadow-sm placeholder:text-warm-400 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 disabled:cursor-not-allowed disabled:opacity-50"
               rows={2}
             />
           </div>
           <div>
-            <label className="text-xs font-semibold uppercase text-[hsl(var(--warm-500))]">
-              Back
+            <label
+              htmlFor={`flashcard-${flashcard.id}-back`}
+              className="text-sm font-semibold text-warm-700"
+            >
+              Answer
             </label>
             <textarea
+              id={`flashcard-${flashcard.id}-back`}
               value={editBack}
               onChange={(e) => setEditBack(e.target.value)}
-              className="mt-1 flex min-h-[60px] w-full resize-none rounded-lg border border-[hsl(var(--warm-300))] bg-[hsl(var(--warm-50))] px-3 py-2 text-sm text-[hsl(var(--warm-800))] shadow-sm placeholder:text-[hsl(var(--warm-400))] focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--terracotta)/0.15)] disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-1.5 flex min-h-[64px] w-full resize-none rounded-lg border border-warm-300 bg-white px-3 py-2 text-sm text-warm-800 shadow-sm placeholder:text-warm-400 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 disabled:cursor-not-allowed disabled:opacity-50"
               rows={2}
             />
           </div>
@@ -118,10 +120,10 @@ export function FlashcardItem({
               onClick={() => setIsEditing(false)}
               disabled={isSaving}
             >
-              <X className="mr-1 h-4 w-4" /> Cancel
+              <X aria-hidden="true" /> Cancel
             </Button>
             <Button size="sm" onClick={handleSave} disabled={isSaving}>
-              <Check className="mr-1 h-4 w-4" /> Save
+              <Check aria-hidden="true" /> Save
             </Button>
           </div>
         </CardContent>
@@ -129,71 +131,80 @@ export function FlashcardItem({
     );
   }
 
+  const faceClass =
+    'absolute inset-0 flex flex-col items-center justify-center rounded-xl border p-6 text-center [backface-visibility:hidden]';
+
   return (
-    <div
-      className="group relative mb-4 h-48 w-full cursor-pointer [perspective:1000px]"
-      onClick={handleFlip}
-    >
-      <div
-        className={cn(
-          'relative h-full w-full rounded-xl border-2 shadow-md transition-all duration-500 [transform-style:preserve-3d]',
-          isFlipped
-            ? 'border-[hsl(var(--sage-light))] [transform:rotateY(180deg)]'
-            : 'border-[hsl(var(--warm-200))] hover:border-primary/30'
-        )}
+    <div className="group relative h-48 w-full [perspective:1000px]">
+      <button
+        type="button"
+        onClick={() => setIsFlipped((prev) => !prev)}
+        aria-pressed={isFlipped}
+        aria-label={`${isFlipped ? 'Answer' : 'Question'}: ${
+          isFlipped ? flashcard.back : flashcard.front
+        }. Flip card`}
+        className="relative h-full w-full rounded-xl text-left transition-transform duration-500 [transform-style:preserve-3d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[flipped=true]:[transform:rotateY(180deg)]"
+        data-flipped={isFlipped}
       >
-        <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl bg-[hsl(var(--card))] p-6 text-center [backface-visibility:hidden]">
-          <div className="absolute left-3 top-3">
-            <span className="rounded-full bg-[hsl(var(--terracotta-light))] px-2 py-1 text-xs font-bold uppercase tracking-wider text-[hsl(var(--terracotta-dark))]">
-              Question
-            </span>
-          </div>
-          <p className="line-clamp-4 text-lg font-medium text-[hsl(var(--warm-800))]">
+        <span
+          className={cn(
+            faceClass,
+            'border-warm-200 bg-card shadow-raised group-hover:border-primary/30'
+          )}
+          aria-hidden="true"
+        >
+          <span className="absolute left-3 top-3 rounded-full bg-terracotta-light px-2 py-0.5 text-xs font-semibold text-terracotta-dark">
+            Question
+          </span>
+          <span className="line-clamp-4 text-base font-medium leading-snug text-warm-800">
             {flashcard.front}
-          </p>
-          <div className="absolute bottom-3 right-3 text-primary opacity-0 transition-opacity group-hover:opacity-100">
-            <RotateCw className="h-4 w-4" />
-          </div>
-        </div>
+          </span>
+          <RotateCw
+            className="absolute bottom-3 right-3 h-4 w-4 text-warm-400 transition-colors group-hover:text-primary"
+            aria-hidden="true"
+          />
+        </span>
 
-        <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl bg-gradient-to-br from-[hsl(var(--warm-100))] to-[hsl(var(--sage-light))] p-6 text-center [backface-visibility:hidden] [transform:rotateY(180deg)]">
-          <div className="absolute left-3 top-3">
-            <span className="rounded-full bg-[hsl(var(--sage-light))] px-2 py-1 text-xs font-bold uppercase tracking-wider text-[hsl(var(--sage-dark))]">
-              Answer
-            </span>
-          </div>
-          <p className="line-clamp-4 text-lg font-medium text-[hsl(var(--warm-800))]">
+        <span
+          className={cn(
+            faceClass,
+            'border-sage/30 bg-sage-light/60 shadow-raised [transform:rotateY(180deg)]'
+          )}
+          aria-hidden="true"
+        >
+          <span className="absolute left-3 top-3 rounded-full bg-sage-light px-2 py-0.5 text-xs font-semibold text-sage-dark ring-1 ring-sage/20">
+            Answer
+          </span>
+          <span className="line-clamp-4 text-base font-medium leading-snug text-warm-800">
             {flashcard.back}
-          </p>
-        </div>
+          </span>
+        </span>
+      </button>
 
-        {!isReadOnly ? (
-          <div className="absolute right-2 top-2 z-10 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 rounded-full bg-white/80 shadow-sm hover:bg-white"
-              onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                setIsEditing(true);
-              }}
-            >
-              <Pencil className="h-3.5 w-3.5 text-[hsl(var(--warm-600))]" />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 rounded-full bg-white/80 shadow-sm hover:bg-red-50 hover:text-red-600"
-              onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                handleDelete();
-              }}
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-        ) : null}
-      </div>
+      {!isReadOnly ? (
+        <div className="absolute right-2 top-2 z-10 flex gap-1 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
+          <Button
+            type="button"
+            size="icon"
+            variant="outline"
+            className="h-8 w-8 rounded-lg"
+            onClick={() => setIsEditing(true)}
+            aria-label="Edit flashcard"
+          >
+            <Pencil className="!size-3.5" aria-hidden="true" />
+          </Button>
+          <Button
+            type="button"
+            size="icon"
+            variant="outline"
+            className="h-8 w-8 rounded-lg hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
+            onClick={handleDelete}
+            aria-label="Delete flashcard"
+          >
+            <Trash2 className="!size-3.5" aria-hidden="true" />
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }

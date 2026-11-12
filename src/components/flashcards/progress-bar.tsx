@@ -12,15 +12,16 @@ export function ProgressBar({ current, total }: ProgressBarProps) {
 
   return (
     <div className="w-full max-w-md space-y-2">
-      <div className="flex justify-between text-sm font-medium text-[hsl(var(--warm-500))]">
-        <span>Progress</span>
-        <span>
-          {current} of {total}
+      <div className="flex justify-between text-sm text-warm-500">
+        <span className="font-medium text-warm-700">Progress</span>
+        <span className="tabular-nums" aria-live="polite">
+          Card {current} of {total}
         </span>
       </div>
       <Progress
         value={progress}
-        className="h-2 bg-[hsl(var(--warm-200))] [&>*]:bg-gradient-to-r [&>*]:from-primary [&>*]:to-[hsl(var(--sage))]"
+        aria-label={`Card ${current} of ${total}`}
+        className="h-1.5 bg-warm-200"
       />
     </div>
   );

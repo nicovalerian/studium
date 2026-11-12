@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Layers, Loader2, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { WorkspaceAccessState } from '@/lib/auth/access';
 
@@ -48,7 +48,7 @@ export function GenerateButton({
       if (data.flashcards && data.flashcards.length > 0) {
         onGenerateComplete(data.flashcards);
         toast({
-          title: 'Success!',
+          title: 'Flashcards ready',
           description: `Generated ${data.flashcards.length} new flashcards.`,
         });
       } else {
@@ -75,37 +75,38 @@ export function GenerateButton({
       <Button
         onClick={handleGenerate}
         disabled={(!isBlocked && disabled) || isGenerating}
-        className="h-auto min-h-11 w-full whitespace-normal px-4 py-3 text-center font-semibold leading-snug text-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:bg-[hsl(var(--terracotta-dark))] hover:shadow-md"
+        aria-busy={isGenerating}
+        className="h-auto min-h-11 w-full whitespace-normal px-4 py-3 text-center font-semibold leading-snug"
       >
         {isGenerating ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Generating...
+            <Loader2 className="animate-spin" aria-hidden="true" />
+            Generating flashcards…
           </>
         ) : isBlocked ? (
           <>
-            <Sparkles className="mr-2 h-4 w-4" />
+            <Lock aria-hidden="true" />
             {workspaceState === 'guest'
               ? 'Sign in to generate flashcards'
               : 'Verify email to generate'}
           </>
         ) : (
           <>
-            <Sparkles className="mr-2 h-4 w-4" />
-            Generate Flashcards
+            <Layers aria-hidden="true" />
+            Generate flashcards
           </>
         )}
       </Button>
       {isBlocked ? (
-        <p className="text-center text-xs text-[hsl(var(--warm-500))]">
+        <p className="text-center text-xs text-warm-500">
           {workspaceState === 'guest'
             ? 'Create an account first, then flashcards unlock right away.'
             : 'Email verification unlocks flashcard generation.'}
         </p>
       ) : null}
       {disabled && !isGenerating && !isBlocked ? (
-        <p className="text-center text-xs text-[hsl(var(--warm-500))]">
-          Upload and process documents first to generate flashcards
+        <p className="text-center text-xs text-warm-500">
+          Upload and process documents first to generate flashcards.
         </p>
       ) : null}
     </div>

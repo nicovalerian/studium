@@ -37,23 +37,26 @@ export default async function FlashcardsPage({ params }: FlashcardsPageProps) {
   return (
     <DesktopOnlyGate>
       <div className="min-h-screen bg-background">
-        <header className="border-b bg-card">
-          <div className="container mx-auto flex min-h-16 flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-4">
-              <Link href={`/class/${id}`} className="transition-opacity hover:opacity-90">
+        <header className="border-b border-warm-200 bg-card">
+          <div className="container mx-auto flex min-h-16 items-center justify-between gap-4 px-4 py-3">
+            <div className="flex min-w-0 items-center gap-4">
+              <Link
+                href={`/class/${id}`}
+                aria-label="Back to your workspace"
+                className="shrink-0 rounded-lg transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
                 <Logo size="sm" />
               </Link>
-              <div>
-                <p className="text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">
-                  Study mode
-                </p>
-                <h1 className="text-xl font-semibold text-foreground">{classData.name}</h1>
+              <span className="hidden h-8 w-px bg-warm-200 sm:block" aria-hidden="true" />
+              <div className="min-w-0">
+                <h1 className="truncate text-lg font-semibold text-warm-900">{classData.name}</h1>
+                <p className="text-sm text-warm-500">Flashcard review</p>
               </div>
             </div>
             <UserNav user={user} />
           </div>
         </header>
-        <main className="container mx-auto px-4">
+        <main id="main-content" className="container mx-auto px-4" tabIndex={-1}>
           <FlashcardReview flashcards={flashcards || []} classId={id} />
         </main>
       </div>
