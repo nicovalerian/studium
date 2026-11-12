@@ -116,14 +116,14 @@ function FeatureVisual({ visual }: { visual: (typeof features)[number]['visual']
 
     case 'review':
       return (
-        <ol className="grid h-full gap-2 sm:grid-cols-3">
+        <ol className="grid h-full gap-2 sm:grid-cols-3 sm:content-end">
           {studySteps.map((step, index) => {
             const isCurrent = index === studySteps.length - 1;
             return (
               <li
                 key={step.title}
                 className={cn(
-                  'flex items-center gap-3 rounded-xl px-4 py-3.5 text-sm font-medium sm:flex-col sm:items-start sm:justify-between sm:gap-6 sm:py-4',
+                  'flex items-center gap-3 rounded-xl px-4 py-3.5 text-sm font-medium sm:flex-col sm:items-start sm:gap-4 sm:py-4',
                   isCurrent
                     ? 'bg-terracotta-light text-terracotta-dark'
                     : 'bg-warm-50 text-warm-700'
