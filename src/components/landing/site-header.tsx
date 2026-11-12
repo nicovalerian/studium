@@ -24,7 +24,7 @@ export function SiteHeader() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-white/65 transition-colors duration-200 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="rounded-md text-sm font-medium text-white/75 transition-colors duration-200 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-warm-900"
             >
               {link.label}
             </Link>
@@ -34,13 +34,13 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           <Link
             href="/login"
-            className="hidden min-h-11 items-center px-4 text-sm font-medium text-white/70 transition-colors hover:text-white sm:inline-flex"
+            className="hidden min-h-11 items-center rounded-lg px-4 text-sm font-medium text-white/75 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:inline-flex"
           >
             Sign in
           </Link>
           <Link
             href="/dashboard"
-            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-warm-900 shadow-lg shadow-black/10 transition-all duration-200 hover:bg-violet-50 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-warm-900"
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-warm-900 transition-colors duration-200 hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-warm-900"
           >
             Open Studium
             <ArrowUpRight className="h-4 w-4" />

@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { buildLoginHref, type WorkspaceAccessState } from '@/lib/auth/access';
-import { Loader2, Lock, MailCheck, Sparkles } from 'lucide-react';
+import { Eye, Loader2, Lock, MailCheck } from 'lucide-react';
 
 type GuardedWorkspaceState = Exclude<WorkspaceAccessState, 'verified'>;
 type GuardedAction =
@@ -60,35 +60,29 @@ export function WorkspaceAccessBanner({
 }: WorkspaceAccessBannerProps) {
   if (state === 'guest') {
     return (
-      <div className="border-b border-border bg-[linear-gradient(90deg,rgba(59,130,246,0.06),rgba(16,185,129,0.04))] px-4 py-3">
-        <div className="flex flex-col gap-3">
-          <div className="flex items-start gap-3">
-            <div className="rounded-2xl bg-primary/10 p-2 text-primary">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">Guest preview is live</p>
-              <p className="text-sm text-muted-foreground">
-                Explore the dashboard first. Sign in when you are ready to upload files, chat, and
-                generate flashcards. Use the navbar whenever you want to continue.
-              </p>
-            </div>
-          </div>
+      <div role="status" className="border-b border-border bg-secondary/60 px-4 py-2.5 sm:px-6">
+        <div className="flex items-start gap-2.5">
+          <Eye className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+          <p className="text-sm text-warm-600">
+            <span className="font-semibold text-foreground">Guest preview.</span> Explore the
+            dashboard first. Sign in when you are ready to upload files, chat, and generate
+            flashcards.
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="border-b border-border bg-[linear-gradient(90deg,rgba(245,158,11,0.1),rgba(244,63,94,0.04))] px-4 py-3">
+    <div role="status" className="border-b border-amber-200 bg-amber-50 px-4 py-2.5 sm:px-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-start gap-3">
-          <div className="rounded-2xl bg-amber-500/10 p-2 text-amber-600">
-            <MailCheck className="h-5 w-5" />
-          </div>
+        <div className="flex items-start gap-2.5">
+          <MailCheck className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" aria-hidden="true" />
           <div>
-            <p className="text-sm font-semibold text-foreground">Verify your email to unlock Studium</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm font-semibold text-amber-950">
+              Verify your email to unlock Studium
+            </p>
+            <p className="text-sm text-amber-900">
               {email ? `We sent a verification link to ${email}. ` : null}
               Uploads, chat, and flashcard generation stay locked until your email is confirmed.
             </p>
@@ -141,7 +135,7 @@ export function WorkspaceAccessDialog({
             {state === 'guest' ? (
               <Lock className="h-5 w-5 text-primary" />
             ) : (
-              <MailCheck className="h-5 w-5 text-amber-600" />
+              <MailCheck className="h-5 w-5 text-amber-700" />
             )}
             {state === 'guest' ? 'Sign in to continue' : 'Verify your email first'}
           </AlertDialogTitle>

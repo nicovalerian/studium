@@ -6,6 +6,7 @@ import { Loader2, MailCheck } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { AnimatedBackground } from '@/components/ui/animated-background';
 import { LoginButton } from '@/components/auth/login-button';
 import { useToast } from '@/hooks/use-toast';
 import type { AuthMode } from '@/lib/auth/access';
@@ -176,29 +177,33 @@ export function AuthPanel({ nextPath, initialMode, initialError }: AuthPanelProp
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-1.5 rounded-xl border border-warm-200 bg-warm-100 p-1.5">
-        <Button
-          type="button"
-          variant={mode === 'signin' ? 'default' : 'ghost'}
-          className="min-h-10 rounded-lg"
-          onClick={() => {
+      <div
+        role="tablist"
+        aria-label="Account mode"
+        className="grid grid-cols-2 gap-1 rounded-xl border border-warm-200 bg-warm-100 p-1"
+      >
+        <AnimatedBackground
+          value={mode}
+          onValueChange={(value) => {
             clearMessages();
-            setMode('signin');
+            setMode(value as AuthMode);
           }}
+          className="rounded-lg bg-white shadow-raised ring-1 ring-warm-200"
         >
-          Sign in
-        </Button>
-        <Button
-          type="button"
-          variant={mode === 'signup' ? 'default' : 'ghost'}
-          className="min-h-10 rounded-lg"
-          onClick={() => {
-            clearMessages();
-            setMode('signup');
-          }}
-        >
-          Create account
-        </Button>
+          {[
+            { id: 'signin', label: 'Sign in' },
+            { id: 'signup', label: 'Create account' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              data-id={tab.id}
+              type="button"
+              className="flex min-h-10 items-center justify-center rounded-lg px-3 text-sm font-semibold text-warm-500 transition-colors hover:text-warm-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[state=active]:text-primary"
+            >
+              {tab.label}
+            </button>
+          ))}
+        </AnimatedBackground>
       </div>
 
       <LoginButton nextPath={nextPath} />
@@ -207,8 +212,8 @@ export function AuthPanel({ nextPath, initialMode, initialError }: AuthPanelProp
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-warm-200" />
         </div>
-        <div className="relative flex justify-center text-xs uppercase tracking-[0.22em] text-warm-400">
-          <span className="bg-white px-3">Or continue with email</span>
+        <div className="relative flex justify-center text-sm text-warm-500">
+          <span className="bg-white px-3">or continue with email</span>
         </div>
       </div>
 
@@ -225,6 +230,8 @@ export function AuthPanel({ nextPath, initialMode, initialError }: AuthPanelProp
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             disabled={isSubmitting}
+            aria-invalid={errorMessage ? true : undefined}
+            aria-describedby={errorMessage ? 'auth-error' : undefined}
           />
         </div>
 
@@ -240,25 +247,28 @@ export function AuthPanel({ nextPath, initialMode, initialError }: AuthPanelProp
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             disabled={isSubmitting}
+            aria-invalid={errorMessage ? true : undefined}
+            aria-describedby={errorMessage ? 'auth-error' : undefined}
           />
         </div>
 
-        <Button type="submit" className="h-11 w-full rounded-xl" disabled={isSubmitting}>
+        <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
           {mode === 'signin' ? 'Sign in with email' : 'Create account with email'}
         </Button>
       </form>
 
       {verificationEmail ? (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4 text-sm text-amber-900">
+        <div
+          role="status"
+          className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
+        >
           <div className="flex items-start gap-3">
-            <div className="rounded-xl bg-amber-100 p-2 text-amber-700">
-              <MailCheck className="h-5 w-5" />
-            </div>
+            <MailCheck className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" aria-hidden="true" />
             <div className="space-y-3">
               <div>
                 <p className="font-semibold">Verify your email to unlock Studium</p>
-                <p className="mt-1 text-amber-800/80">
+                <p className="mt-1 text-amber-800">
                   We sent a Studium verification link to{' '}
                   <span className="font-medium">{verificationEmail}</span>. Once you confirm it, we
                   will send you straight to the dashboard.
@@ -268,7 +278,7 @@ export function AuthPanel({ nextPath, initialMode, initialError }: AuthPanelProp
                 type="button"
                 size="sm"
                 variant="outline"
-                className="border-amber-300 bg-white/80"
+                className="border-amber-300"
                 onClick={handleResendVerification}
                 disabled={isResending}
               >
@@ -281,14 +291,18 @@ export function AuthPanel({ nextPath, initialMode, initialError }: AuthPanelProp
       ) : null}
 
       {errorMessage ? (
-        <div className="rounded-2xl border border-rose-200 bg-rose-50/80 px-4 py-3 text-sm text-rose-900">
+        <div
+          id="auth-error"
+          role="alert"
+          className="rounded-xl border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+        >
           {errorMessage}
         </div>
       ) : null}
 
       <p className="text-center text-xs leading-relaxed text-warm-500">
-        Use the same email for Google and email sign-in so Supabase can keep everything under one
-        Studium account.
+        Use the same email for Google and email sign-in to keep everything under one Studium
+        account.
       </p>
     </div>
   );

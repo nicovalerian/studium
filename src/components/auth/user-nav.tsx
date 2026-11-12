@@ -7,6 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { User } from '@supabase/supabase-js';
@@ -60,7 +61,11 @@ export function UserNav({ user }: UserNavProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 overflow-hidden rounded-full p-0">
+        <Button
+          variant="outline"
+          className="relative h-10 w-10 overflow-hidden rounded-full p-0"
+          aria-label="Open account menu"
+        >
           {user.user_metadata?.avatar_url ? (
             <Image
               src={user.user_metadata.avatar_url}
@@ -70,16 +75,14 @@ export function UserNav({ user }: UserNavProps) {
               sizes="40px"
             />
           ) : (
-            <UserIcon className="h-5 w-5" />
+            <UserIcon className="!size-5 text-warm-600" aria-hidden="true" />
           )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem disabled className="font-medium">
-          {user.email}
-        </DropdownMenuItem>
+        <DropdownMenuLabel className="max-w-[16rem] truncate">{user.email}</DropdownMenuLabel>
         <DropdownMenuItem onClick={handleSignOut}>
-          <LogOut className="mr-2 h-4 w-4" />
+          <LogOut aria-hidden="true" />
           Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
